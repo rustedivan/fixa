@@ -7,19 +7,20 @@
 //
 
 import Cocoa
+import Dispatch
 import SwiftUI
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
 	var window: NSWindow!
-
+	var timer: DispatchSourceTimer!
+	var results: FixaBrowserResults!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
-		let connectedApp = "Connected app name"
-		let connectedDevice = "Connected device"
+		results = FixaBrowserResults(apps: [])
 		// Create the SwiftUI view that provides the window contents.
-		let controlPanelView = ControlPanelView(connectedAppName: connectedApp, connectedDeviceName: connectedDevice)
+		let controlPanelView = FixaBrowserView(availableFixaApps: results)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
@@ -32,6 +33,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		window.makeKeyAndOrderFront(nil)
 		
 		startBrowsing()
+		
+		timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+		timer.schedule(deadline: .now(), repeating: 1.0)
+		timer.setEventHandler {
+			self.results.foundApps.append("App")
+		}
+		timer.activate()
 	}
 
 	func applicationWillTerminate(_ aNotification: Notification) {

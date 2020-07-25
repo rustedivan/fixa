@@ -8,8 +8,17 @@
 
 import Foundation
 import Network
+import SwiftUI
 
 var browser: NWBrowser!
+
+class FixaBrowserResults: ObservableObject {
+	@Published var foundApps: [String]
+	
+	init(apps: [String]) {
+		self.foundApps = apps
+	}
+}
 
 func startBrowsing() {
 	let parameters = NWParameters()
