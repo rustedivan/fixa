@@ -9,12 +9,15 @@
 import SwiftUI
 
 struct ContentView: View {
+	let connectedAppName: String
+	let connectedDeviceName: String
+	
 	var body: some View {
 		VStack {
 			HStack {
 				VStack(alignment: .leading) {
-					Text("TapMap").font(.title)
-					Text("on Raido").font(.subheadline)
+					Text(connectedAppName).font(.title)
+					Text("on \(connectedDeviceName)").font(.subheadline)
 				}
 				Spacer()
 			}
@@ -51,7 +54,7 @@ struct BorderControls: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-			ContentView()
+			ContentView(connectedAppName: "Connected App", connectedDeviceName: "connected device")
 				.frame(width: 400.0, height: 600.0)
     }
 }

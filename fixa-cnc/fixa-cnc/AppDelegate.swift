@@ -16,8 +16,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
+		let connectedApp = "Connected app name"
+		let connectedDevice = "Connected device"
 		// Create the SwiftUI view that provides the window contents.
-		let contentView = ContentView()
+		let contentView = ContentView(connectedAppName: connectedApp, connectedDeviceName: connectedDevice)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
