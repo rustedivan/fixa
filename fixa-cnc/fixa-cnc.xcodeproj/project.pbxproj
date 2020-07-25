@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1409032224CCBA13000440FD /* FixaBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1409032124CCBA13000440FD /* FixaBrowserView.swift */; };
 		14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13324CACC2D007DD082 /* AppDelegate.swift */; };
 		14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ControlPanelView.swift */; };
 		14D2B13824CACC2E007DD082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13724CACC2E007DD082 /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1409032124CCBA13000440FD /* FixaBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaBrowserView.swift; sourceTree = "<group>"; };
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14D2B13524CACC2D007DD082 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
@@ -59,6 +61,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1409032324CCBB19000440FD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				14D2B13524CACC2D007DD082 /* ControlPanelView.swift */,
+				1409032124CCBA13000440FD /* FixaBrowserView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		14D2B12724CACC2D007DD082 = {
 			isa = PBXGroup;
 			children = (
@@ -82,7 +93,7 @@
 			children = (
 				14D2B13324CACC2D007DD082 /* AppDelegate.swift */,
 				14D2B17824CB028B007DD082 /* FixaServer.swift */,
-				14D2B13524CACC2D007DD082 /* ControlPanelView.swift */,
+				1409032324CCBB19000440FD /* Views */,
 				14D2B13724CACC2E007DD082 /* Assets.xcassets */,
 				14D2B13C24CACC2E007DD082 /* Main.storyboard */,
 				14D2B13F24CACC2E007DD082 /* Info.plist */,
@@ -213,6 +224,7 @@
 				14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */,
 				14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */,
 				14D2B17924CB028B007DD082 /* FixaServer.swift in Sources */,
+				1409032224CCBA13000440FD /* FixaBrowserView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
