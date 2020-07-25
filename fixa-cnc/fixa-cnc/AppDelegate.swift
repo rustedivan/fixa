@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		let connectedApp = "Connected app name"
 		let connectedDevice = "Connected device"
 		// Create the SwiftUI view that provides the window contents.
-		let contentView = ContentView(connectedAppName: connectedApp, connectedDeviceName: connectedDevice)
+		let controlPanelView = ControlPanelView(connectedAppName: connectedApp, connectedDeviceName: connectedDevice)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		    backing: .buffered, defer: false)
 		window.center()
 		window.setFrameAutosaveName("Main Window")
-		window.contentView = NSHostingView(rootView: contentView)
+		window.contentView = NSHostingView(rootView: controlPanelView)
 		window.makeKeyAndOrderFront(nil)
 		
 		startBrowsing()

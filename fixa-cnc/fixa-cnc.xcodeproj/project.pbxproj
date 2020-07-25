@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13324CACC2D007DD082 /* AppDelegate.swift */; };
-		14D2B13624CACC2D007DD082 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ContentView.swift */; };
+		14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ControlPanelView.swift */; };
 		14D2B13824CACC2E007DD082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13724CACC2E007DD082 /* Assets.xcassets */; };
 		14D2B13B24CACC2E007DD082 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13A24CACC2E007DD082 /* Preview Assets.xcassets */; };
 		14D2B13E24CACC2E007DD082 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13C24CACC2E007DD082 /* Main.storyboard */; };
@@ -29,7 +29,7 @@
 /* Begin PBXFileReference section */
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		14D2B13524CACC2D007DD082 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		14D2B13524CACC2D007DD082 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
 		14D2B13724CACC2E007DD082 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		14D2B13A24CACC2E007DD082 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		14D2B13D24CACC2E007DD082 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -82,7 +82,7 @@
 			children = (
 				14D2B13324CACC2D007DD082 /* AppDelegate.swift */,
 				14D2B17824CB028B007DD082 /* FixaServer.swift */,
-				14D2B13524CACC2D007DD082 /* ContentView.swift */,
+				14D2B13524CACC2D007DD082 /* ControlPanelView.swift */,
 				14D2B13724CACC2E007DD082 /* Assets.xcassets */,
 				14D2B13C24CACC2E007DD082 /* Main.storyboard */,
 				14D2B13F24CACC2E007DD082 /* Info.plist */,
@@ -210,7 +210,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14D2B13624CACC2D007DD082 /* ContentView.swift in Sources */,
+				14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */,
 				14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */,
 				14D2B17924CB028B007DD082 /* FixaServer.swift in Sources */,
 			);

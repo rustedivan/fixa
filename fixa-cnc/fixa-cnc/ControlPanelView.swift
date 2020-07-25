@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  ControlPanelView.swift
 //  fixa-cnc
 //
 //  Created by Ivan Milles on 2020-07-24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct ControlPanelView: View {
 	let connectedAppName: String
 	let connectedDeviceName: String
 	
@@ -52,9 +52,9 @@ struct BorderControls: View {
 	}
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct ControlPanelView_Previews: PreviewProvider {
     static var previews: some View {
-			ContentView(connectedAppName: "Connected App", connectedDeviceName: "connected device")
+			ControlPanelView(connectedAppName: "Connected App", connectedDeviceName: "connected device")
 				.frame(width: 400.0, height: 600.0)
     }
 }
