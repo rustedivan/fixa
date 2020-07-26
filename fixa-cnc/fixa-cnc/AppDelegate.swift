@@ -15,12 +15,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 	var window: NSWindow!
 	var timer: DispatchSourceTimer!
-	var results: FixaBrowserResults!
+	var results: BrowserResults!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
-		results = FixaBrowserResults(apps: [])
+		results = BrowserResults(apps: [])
 		// Create the SwiftUI view that provides the window contents.
-		let controlPanelView = FixaBrowserView(availableFixaApps: results)
+		let controlPanelView = BrowserView(availableFixaApps: results)
 
 		// Create the window and set the content view. 
 		window = NSWindow(

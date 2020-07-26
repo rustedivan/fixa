@@ -1,5 +1,5 @@
 //
-//  FixaBrowserView.swift
+//  BrowserView.swift
 //  fixa-cnc
 //
 //  Created by Ivan Milles on 2020-07-25.
@@ -8,8 +8,8 @@
 
 import SwiftUI
 
-struct FixaBrowserView: View {
-	@ObservedObject var availableFixaApps: FixaBrowserResults
+struct BrowserView: View {
+	@ObservedObject var availableFixaApps: BrowserResults
 	var body: some View {
 			VStack {
 				HStack {
@@ -26,12 +26,12 @@ struct FixaBrowserView: View {
 	}
 }
 
-struct FixaBrowserView_Previews: PreviewProvider {
+struct BrowserView_Previews: PreviewProvider {
 	
   static var previews: some View {
-		let appList = FixaBrowserResults(apps: ["App 1", "App 2", "App 3"])
+		let appList = BrowserResults(apps: ["App 1", "App 2", "App 3"])
 		
-		return FixaBrowserView(availableFixaApps: appList)
+		return BrowserView(availableFixaApps: appList)
 			.frame(width: 400.0, height: 600)
 	}
 }

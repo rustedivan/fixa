@@ -12,7 +12,7 @@ import SwiftUI
 
 var browser: NWBrowser!
 
-class FixaBrowserResults: ObservableObject {
+class BrowserResults: ObservableObject {
 	@Published var foundApps: [String]
 	
 	init(apps: [String]) {
