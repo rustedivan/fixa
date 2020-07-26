@@ -8,13 +8,21 @@
 
 import Foundation
 import Network
+import UIKit
 
 var listener: NWListener!
 
 func startListening() {
 	do {
 		listener = try NWListener(using: .tcp)
-		listener.service = NWListener.Service(name: "Fixa Client", type: "_fixa._tcp")
+		let deviceName = UIDevice.current.name
+		let appName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
+		
+		listener.service = NWListener.Service(name: "Fixa Client", type: "_fixa._tcp", domain: nil, txtRecord: NWTXTRecord([
+			"deviceName": deviceName,
+			"appName": appName
+		]))
+		
 		listener.stateUpdateHandler = { newState in
 			print(newState)
 		}

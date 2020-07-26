@@ -8,29 +8,76 @@
 
 import Foundation
 import Network
+import NetworkExtension
 import SwiftUI
 
 var browser: NWBrowser!
 
-class BrowserResults: ObservableObject {
-	@Published var foundApps: [String]
+struct BrowserResult {
+	let deviceName: String
+	let appName: String
+	let interfaces: String
+	let endpoint: NWBonjourServiceEndpoint?
 	
-	init(apps: [String]) {
-		self.foundApps = apps
+	init?(_ nwResult: NWBrowser.Result) {
+		guard case .service(let name, let type, let domain, _) = nwResult.endpoint else { return nil }
+		guard case .bonjour(let metadata) = nwResult.metadata else { return nil }
+		
+		self.deviceName = metadata.dictionary["deviceName"] ?? "Unknown device"
+		self.appName = metadata.dictionary["appName"] ?? "Unknown app"
+		self.interfaces = nwResult.interfaces.map { interface in
+			switch interface.type {
+				case .wifi: return "wifi"
+				case .loopback: return "local"
+				default: return "other"
+			}
+		}.joined(separator: " ")
+		
+		self.endpoint = NWBonjourServiceEndpoint(name: name, type: type, domain: domain)
 	}
 }
 
-func startBrowsing() {
-	let parameters = NWParameters()
-	parameters.includePeerToPeer = true
-	browser = NWBrowser(for: .bonjour(type: "_fixa._tcp", domain: nil), using: parameters)
-	browser.stateUpdateHandler = { newState in
-		print(newState)
-	}
+class BrowserResults: ObservableObject {
+	@Published var browsing: Bool
+	@Published var foundApps: [BrowserResult]
 	
-	browser.browseResultsChangedHandler = { results, changes in
-		print(results)
+	init() {
+		self.browsing = true
+		self.foundApps = []
 	}
-	
-	browser.start(queue: .main)
 }
+
+class FixaServer {
+	static let bonjourType = "_fixa._tcp"
+	let browserResults: BrowserResults
+	
+	init() {
+		self.browserResults = BrowserResults()
+	}
+	
+	func startBrowsing() {
+		let parameters = NWParameters()
+		parameters.includePeerToPeer = true
+		browser = NWBrowser(for: .bonjourWithTXTRecord(type: FixaServer.bonjourType, domain: nil), using: parameters)
+		browser.stateUpdateHandler = { newState in
+			switch newState {
+				case .ready: self.browserResults.browsing = true
+				default: self.browserResults.browsing = false
+			}
+		}
+		
+		browser.browseResultsChangedHandler = { results, changes in
+			let fixaApps = results.filter { result in
+				if case .service(_, let type, _, _) = result.endpoint, type == FixaServer.bonjourType {
+					return true
+				} else {
+					return false
+				}
+			}
+			self.browserResults.foundApps = fixaApps.compactMap { BrowserResult($0) }
+		}
+		
+		browser.start(queue: .main)
+	}
+}
+

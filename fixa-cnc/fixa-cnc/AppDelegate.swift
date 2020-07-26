@@ -15,12 +15,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 	var window: NSWindow!
 	var timer: DispatchSourceTimer!
-	var results: BrowserResults!
+	var server: FixaServer!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
-		results = BrowserResults(apps: [])
-		// Create the SwiftUI view that provides the window contents.
-		let controlPanelView = BrowserView(availableFixaApps: results)
+		server = FixaServer()
+		
+		let controlPanelView = BrowserView(availableFixaApps: server.browserResults)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
@@ -32,14 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		window.contentView = NSHostingView(rootView: controlPanelView)
 		window.makeKeyAndOrderFront(nil)
 		
-		startBrowsing()
-		
-		timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
-		timer.schedule(deadline: .now(), repeating: 1.0)
-		timer.setEventHandler {
-			self.results.foundApps.append("App")
-		}
-		timer.activate()
+		server.startBrowsing()
 	}
 
 	func applicationWillTerminate(_ aNotification: Notification) {
