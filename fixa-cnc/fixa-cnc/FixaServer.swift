@@ -9,7 +9,6 @@
 import Foundation
 import Combine
 import Network
-import NetworkExtension
 import SwiftUI
 
 var browser: NWBrowser!
@@ -18,10 +17,10 @@ struct BrowserResult {
 	let deviceName: String
 	let appName: String
 	let interfaces: String
-	let endpoint: NWBonjourServiceEndpoint!
+	let endpoint: NWEndpoint!
 	
 	init?(_ nwResult: NWBrowser.Result) {
-		guard case .service(let name, let type, let domain, _) = nwResult.endpoint else { return nil }
+		guard case .service = nwResult.endpoint else { return nil }
 		guard case .bonjour(let metadata) = nwResult.metadata else { return nil }
 		
 		self.deviceName = metadata.dictionary["deviceName"] ?? "Unknown device"
@@ -34,7 +33,7 @@ struct BrowserResult {
 			}
 		}.joined(separator: " ")
 		
-		self.endpoint = NWBonjourServiceEndpoint(name: name, type: type, domain: domain)
+		self.endpoint = nwResult.endpoint
 	}
 }
 
@@ -51,6 +50,7 @@ class BrowserResults: ObservableObject {
 class FixaServer {
 	static let bonjourType = "_fixa._tcp"
 	let browserResults: BrowserResults
+	var clientConnection: NWConnection?
 	
 	init() {
 		self.browserResults = BrowserResults()
@@ -58,7 +58,7 @@ class FixaServer {
 	
 	func startBrowsing() {
 		let parameters = NWParameters()
-		parameters.includePeerToPeer = true
+//		parameters.includePeerToPeer = true
 		browser = NWBrowser(for: .bonjourWithTXTRecord(type: FixaServer.bonjourType, domain: nil), using: parameters)
 		browser.stateUpdateHandler = { newState in
 			switch newState {
@@ -81,8 +81,25 @@ class FixaServer {
 		browser.start(queue: .main)
 	}
 	
-	func openConnection(to endpoint: NWBonjourServiceEndpoint) {
-		print("Connecting to \(endpoint)")
+	func openConnection(to endpoint: NWEndpoint) {
+		clientConnection = NWConnection(to: endpoint, using: .tcp)
+		clientConnection?.stateUpdateHandler = { newState in
+			print("Server's connection \(self.clientConnection) changed state: \(newState)")
+		}
+//		clientConnection?.receive(minimumIncompleteLength: 1, maximumLength: 65355, completion: { (data, _, _, error) in
+		clientConnection?.receiveMessage(completion: { (data, _, _, error) in
+			print("Server received message from client...")
+			if let error = error {
+				print(error.localizedDescription)
+			} else if let data = data {
+				let message = String(data: data, encoding: .unicode)
+				print("Received \"\(message)\"")
+			} else {
+				print("No data received")
+			}
+		})
+		clientConnection?.start(queue: .main)
+		print("Server opened connection: \(clientConnection)")
 	}
 }
 

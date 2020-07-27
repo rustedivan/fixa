@@ -8,7 +8,7 @@
 
 import Cocoa
 import Combine
-import NetworkExtension
+import Network
 import SwiftUI
 
 @NSApplicationMain

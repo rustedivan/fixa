@@ -8,7 +8,7 @@
 
 import SwiftUI
 import Combine
-import NetworkExtension
+import Network
 
 /////////////////// $ Until XCode 12
 struct ActivityIndicator: NSViewRepresentable {
@@ -29,7 +29,7 @@ struct ActivityIndicator: NSViewRepresentable {
 
 struct BrowserView: View {
 	@ObservedObject var availableFixaApps: BrowserResults
-	var connectSubject = PassthroughSubject<NWBonjourServiceEndpoint, Never>()
+	var connectSubject = PassthroughSubject<NWEndpoint, Never>()
 	
 	var body: some View {
 		HStack {
@@ -56,7 +56,7 @@ struct DeviceCell: View {
 	typealias Failure = Never
 	
 	let device: BrowserResult
-	let callback: (NWBonjourServiceEndpoint) -> ()
+	let callback: (NWEndpoint) -> ()
 	var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
@@ -65,7 +65,7 @@ struct DeviceCell: View {
 			}
 			Spacer()
 			Button("Connect") {
-				self.callback(self.device.endpoint)
+				self.callback(self.device.endpoint!)
 			}
 		}
 	}

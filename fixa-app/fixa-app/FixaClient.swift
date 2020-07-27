@@ -11,6 +11,7 @@ import Network
 import UIKit
 
 var listener: NWListener!
+var connection: NWConnection?
 
 func startListening() {
 	do {
@@ -24,11 +25,28 @@ func startListening() {
 		]))
 		
 		listener.stateUpdateHandler = { newState in
-			print(newState)
+			print("Client's listener changed state: \(newState)")
 		}
 		
-		listener.newConnectionHandler = { connection in
-			print(connection)
+		listener.newConnectionHandler = { newConnection in
+			connection = newConnection
+			connection!.stateUpdateHandler = { newState in
+				print("Client's connection changed state: \(newState)")
+				switch newState {
+					case .ready:
+						DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+							let greeting = "I am \(deviceName)".data(using: .unicode)
+							connection!.send(content: greeting, contentContext: .defaultMessage, isComplete: true, completion: .idempotent)
+						}
+					case .failed(let error):
+						print("Client's connection failed: \(error)")
+						connection!.cancel()
+					default: break
+				}
+			}
+			connection!.start(queue: .main)
+			print("Opening new connection...")
+			
 		}
 		
 		listener.start(queue: .main)
