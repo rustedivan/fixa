@@ -18,7 +18,7 @@ func startListening() {
 		let deviceName = UIDevice.current.name
 		let appName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
 		
-		listener.service = NWListener.Service(name: "Fixa Client", type: "_fixa._tcp", domain: nil, txtRecord: NWTXTRecord([
+		listener.service = NWListener.Service(name: "\(appName) - \(deviceName)", type: "_fixa._tcp", domain: nil, txtRecord: NWTXTRecord([
 			"deviceName": deviceName,
 			"appName": appName
 		]))

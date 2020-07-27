@@ -7,7 +7,8 @@
 //
 
 import Cocoa
-import Dispatch
+import Combine
+import NetworkExtension
 import SwiftUI
 
 @NSApplicationMain
@@ -16,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	var window: NSWindow!
 	var timer: DispatchSourceTimer!
 	var server: FixaServer!
+	var connectSubject: AnyCancellable!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		server = FixaServer()
@@ -33,6 +35,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		window.makeKeyAndOrderFront(nil)
 		
 		server.startBrowsing()
+		connectSubject = controlPanelView.connectSubject
+			.sink { (endpoint) in
+				self.server.openConnection(to: endpoint)
+			}
 	}
 
 	func applicationWillTerminate(_ aNotification: Notification) {

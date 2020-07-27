@@ -7,8 +7,10 @@
 //
 
 import SwiftUI
+import Combine
+import NetworkExtension
 
-// $ Until XCode 12
+/////////////////// $ Until XCode 12
 struct ActivityIndicator: NSViewRepresentable {
 	typealias NSViewType = NSProgressIndicator
 	func makeNSView(context: Context) -> NSProgressIndicator {
@@ -23,9 +25,12 @@ struct ActivityIndicator: NSViewRepresentable {
 	func updateNSView(_ nsView: NSProgressIndicator, context: Context) {
 	}
 }
+//////////////////
 
 struct BrowserView: View {
 	@ObservedObject var availableFixaApps: BrowserResults
+	var connectSubject = PassthroughSubject<NWBonjourServiceEndpoint, Never>()
+	
 	var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
@@ -34,7 +39,9 @@ struct BrowserView: View {
 					ActivityIndicator()
 				}
 				List(availableFixaApps.foundApps, id: \.deviceName) { (result) in
-					DeviceCell(device: result)
+					DeviceCell(device: result) { endpoint in
+						self.connectSubject.send(endpoint)
+					}
 				}
 				Spacer()
 				Text("Found \(availableFixaApps.foundApps.count) Fixa-enabled apps")
@@ -45,7 +52,11 @@ struct BrowserView: View {
 }
 
 struct DeviceCell: View {
+	typealias Output = NWEndpoint
+	typealias Failure = Never
+	
 	let device: BrowserResult
+	let callback: (NWBonjourServiceEndpoint) -> ()
 	var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
@@ -54,7 +65,7 @@ struct DeviceCell: View {
 			}
 			Spacer()
 			Button("Connect") {
-				print("Connect to \(self.device.deviceName)")
+				self.callback(self.device.endpoint)
 			}
 		}
 	}

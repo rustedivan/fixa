@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 import Network
 import NetworkExtension
 import SwiftUI
@@ -17,7 +18,7 @@ struct BrowserResult {
 	let deviceName: String
 	let appName: String
 	let interfaces: String
-	let endpoint: NWBonjourServiceEndpoint?
+	let endpoint: NWBonjourServiceEndpoint!
 	
 	init?(_ nwResult: NWBrowser.Result) {
 		guard case .service(let name, let type, let domain, _) = nwResult.endpoint else { return nil }
@@ -78,6 +79,10 @@ class FixaServer {
 		}
 		
 		browser.start(queue: .main)
+	}
+	
+	func openConnection(to endpoint: NWBonjourServiceEndpoint) {
+		print("Connecting to \(endpoint)")
 	}
 }
 
