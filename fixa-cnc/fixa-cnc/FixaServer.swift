@@ -57,8 +57,9 @@ class FixaServer {
 	}
 	
 	func startBrowsing() {
-		let parameters = NWParameters()
-//		parameters.includePeerToPeer = true
+		let parameters = NWParameters.tcp
+		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
+		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		browser = NWBrowser(for: .bonjourWithTXTRecord(type: FixaServer.bonjourType, domain: nil), using: parameters)
 		browser.stateUpdateHandler = { newState in
 			switch newState {
@@ -82,24 +83,33 @@ class FixaServer {
 	}
 	
 	func openConnection(to endpoint: NWEndpoint) {
-		clientConnection = NWConnection(to: endpoint, using: .tcp)
+		let parameters = NWParameters.tcp
+		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
+		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
+		clientConnection = NWConnection(to: endpoint, using: parameters)
 		clientConnection?.stateUpdateHandler = { newState in
-			print("Server's connection \(self.clientConnection) changed state: \(newState)")
+			print("Server's connection \(String(describing: self.clientConnection)) changed state: \(newState)")
+			switch newState {
+				case .ready:
+					self.receiveMessage()
+				default: break
+			}
 		}
-//		clientConnection?.receive(minimumIncompleteLength: 1, maximumLength: 65355, completion: { (data, _, _, error) in
-		clientConnection?.receiveMessage(completion: { (data, _, _, error) in
-			print("Server received message from client...")
+		clientConnection?.start(queue: .main)
+		print("Server opened connection: \(String(describing: clientConnection))")
+	}
+	
+	func receiveMessage() {
+		clientConnection?.receiveMessage(completion: { (data, context, _, error) in
 			if let error = error {
 				print(error.localizedDescription)
-			} else if let data = data {
-				let message = String(data: data, encoding: .unicode)
-				print("Received \"\(message)\"")
-			} else {
-				print("No data received")
+				
+			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
+				print("Server received message from client...")
+				print("\(String(data: data!, encoding: .unicode))")
+				self.receiveMessage()
 			}
 		})
-		clientConnection?.start(queue: .main)
-		print("Server opened connection: \(clientConnection)")
 	}
 }
 

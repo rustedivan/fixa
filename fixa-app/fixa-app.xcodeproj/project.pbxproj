@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1412DEB624D061A300099C5E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1412DEB524D061A300099C5E /* FixaProtocol.swift */; };
 		1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */; };
 		1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */; };
 		1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEC024CB0C9F00439A24 /* ContentView.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1412DEB524D061A300099C5E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = "../../fixa-client/fixa-client/FixaProtocol.swift"; sourceTree = "<group>"; };
 		1489FEB924CB0C9F00439A24 /* fixa-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 			children = (
 				1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */,
 				1489FED024CB0D4400439A24 /* FixaClient.swift */,
+				1412DEB524D061A300099C5E /* FixaProtocol.swift */,
 				1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */,
 				1489FEC024CB0C9F00439A24 /* ContentView.swift */,
 				1489FEC224CB0C9F00439A24 /* Assets.xcassets */,
@@ -151,6 +154,7 @@
 			files = (
 				1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */,
 				1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */,
+				1412DEB624D061A300099C5E /* FixaProtocol.swift in Sources */,
 				1489FED124CB0D4400439A24 /* FixaClient.swift in Sources */,
 				1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */,
 			);

@@ -15,7 +15,10 @@ var connection: NWConnection?
 
 func startListening() {
 	do {
-		listener = try NWListener(using: .tcp)
+		let parameters = NWParameters.tcp
+		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
+		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
+		listener = try NWListener(using: parameters)
 		let deviceName = UIDevice.current.name
 		let appName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
 		
@@ -25,28 +28,36 @@ func startListening() {
 		]))
 		
 		listener.stateUpdateHandler = { newState in
-			print("Client's listener changed state: \(newState)")
+			switch newState {
+				case .ready: print("Client is listening for connections...")
+				case .cancelled: print("Client stopped listening for connections.")
+				default: break
+			}
 		}
 		
 		listener.newConnectionHandler = { newConnection in
 			connection = newConnection
 			connection!.stateUpdateHandler = { newState in
-				print("Client's connection changed state: \(newState)")
 				switch newState {
 					case .ready:
-						DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-							let greeting = "I am \(deviceName)".data(using: .unicode)
-							connection!.send(content: greeting, contentContext: .defaultMessage, isComplete: true, completion: .idempotent)
-						}
+						print("Client connected to \(connection!). Sending message...")
+						
+						let message = NWProtocolFramer.Message(fixaMessageType: .handshake)
+						let context = NWConnection.ContentContext(identifier: "FixaHandshake", metadata: [message])
+						let greeting = "I am \(deviceName)".data(using: .unicode)
+						connection!.send(content: greeting, contentContext: context, isComplete: true, completion: .contentProcessed { error in
+							print(error ?? "- Message sent.")
+						})
 					case .failed(let error):
 						print("Client's connection failed: \(error)")
 						connection!.cancel()
+					case .cancelled:
+						print("Client's connection was cancelled.")
 					default: break
 				}
 			}
 			connection!.start(queue: .main)
 			print("Opening new connection...")
-			
 		}
 		
 		listener.start(queue: .main)

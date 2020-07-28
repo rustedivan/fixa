@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1409032224CCBA13000440FD /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1409032124CCBA13000440FD /* BrowserView.swift */; };
+		1412DEB824D061AA00099C5E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1412DEB724D061AA00099C5E /* FixaProtocol.swift */; };
 		14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13324CACC2D007DD082 /* AppDelegate.swift */; };
 		14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ControlPanelView.swift */; };
 		14D2B13824CACC2E007DD082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13724CACC2E007DD082 /* Assets.xcassets */; };
@@ -29,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		1409032124CCBA13000440FD /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
+		1412DEB724D061AA00099C5E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = "../../fixa-client/fixa-client/FixaProtocol.swift"; sourceTree = "<group>"; };
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14D2B13524CACC2D007DD082 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 			children = (
 				14D2B13324CACC2D007DD082 /* AppDelegate.swift */,
 				14D2B17824CB028B007DD082 /* FixaServer.swift */,
+				1412DEB724D061AA00099C5E /* FixaProtocol.swift */,
 				1409032324CCBB19000440FD /* Views */,
 				14D2B13724CACC2E007DD082 /* Assets.xcassets */,
 				14D2B13C24CACC2E007DD082 /* Main.storyboard */,
@@ -223,6 +226,7 @@
 			files = (
 				14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */,
 				14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */,
+				1412DEB824D061AA00099C5E /* FixaProtocol.swift in Sources */,
 				14D2B17924CB028B007DD082 /* FixaServer.swift in Sources */,
 				1409032224CCBA13000440FD /* BrowserView.swift in Sources */,
 			);
