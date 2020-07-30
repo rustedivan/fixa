@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:dotplan.md">
+   </FileRef>
+   <FileRef
       location = "group:fixa-app/fixa-app.xcodeproj">
    </FileRef>
    <FileRef

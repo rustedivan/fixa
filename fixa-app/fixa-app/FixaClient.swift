@@ -57,7 +57,6 @@ func startListening() {
 				}
 			}
 			connection!.start(queue: .main)
-			print("Opening new connection...")
 		}
 		
 		listener.start(queue: .main)

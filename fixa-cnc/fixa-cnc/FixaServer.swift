@@ -69,6 +69,7 @@ class FixaServer {
 		}
 		
 		browser.browseResultsChangedHandler = { results, changes in
+			print("Browse results updated - \(results.count) visible services")
 			let fixaApps = results.filter { result in
 				if case .service(_, let type, _, _) = result.endpoint, type == FixaServer.bonjourType {
 					return true
@@ -84,19 +85,20 @@ class FixaServer {
 	
 	func openConnection(to endpoint: NWEndpoint) {
 		let parameters = NWParameters.tcp
+		parameters.prohibitedInterfaceTypes = [.loopback]
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		clientConnection = NWConnection(to: endpoint, using: parameters)
 		clientConnection?.stateUpdateHandler = { newState in
-			print("Server's connection \(String(describing: self.clientConnection)) changed state: \(newState)")
 			switch newState {
 				case .ready:
+					print("Server is connected to client")
 					self.receiveMessage()
 				default: break
 			}
 		}
 		clientConnection?.start(queue: .main)
-		print("Server opened connection: \(String(describing: clientConnection))")
+		print("Server opened connection: \(String(describing: clientConnection?.endpoint.debugDescription))")
 	}
 	
 	func receiveMessage() {
