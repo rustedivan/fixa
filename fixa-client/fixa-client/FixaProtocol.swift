@@ -15,6 +15,7 @@ enum FixaMessageType: UInt32 {
 }
 
 class FixaProtocol: NWProtocolFramerImplementation {
+	static let bonjourType = "_fixa._tcp"
 	static let definition = NWProtocolFramer.Definition(implementation: FixaProtocol.self)
 	static var label = "Fixa Protocol"
 	

@@ -16,13 +16,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 	var window: NSWindow!
 	var timer: DispatchSourceTimer!
-	var server: FixaServer!
+	var controlClient: FixaClient!
 	var connectSubject: AnyCancellable!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
-		server = FixaServer()
+		controlClient = FixaClient()
 		
-		let controlPanelView = BrowserView(availableFixaApps: server.browserResults)
+		let controlPanelView = BrowserView(availableFixaApps: controlClient.browserResults)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
@@ -34,10 +34,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		window.contentView = NSHostingView(rootView: controlPanelView)
 		window.makeKeyAndOrderFront(nil)
 		
-		server.startBrowsing()
+		controlClient.startBrowsing()
 		connectSubject = controlPanelView.connectSubject
 			.sink { (endpoint) in
-				self.server.openConnection(to: endpoint)
+				self.controlClient.stopBrowsing()
+				self.controlClient.openConnection(to: endpoint)
 			}
 	}
 

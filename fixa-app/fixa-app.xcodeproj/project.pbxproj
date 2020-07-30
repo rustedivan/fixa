@@ -14,7 +14,7 @@
 		1489FEC324CB0C9F00439A24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC224CB0C9F00439A24 /* Assets.xcassets */; };
 		1489FEC624CB0C9F00439A24 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */; };
 		1489FEC924CB0C9F00439A24 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC724CB0C9F00439A24 /* LaunchScreen.storyboard */; };
-		1489FED124CB0D4400439A24 /* FixaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FED024CB0D4400439A24 /* FixaClient.swift */; };
+		1489FED124CB0D4400439A24 /* FixaServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FED024CB0D4400439A24 /* FixaServer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 		1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1489FEC824CB0C9F00439A24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1489FECA24CB0C9F00439A24 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1489FED024CB0D4400439A24 /* FixaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaClient.swift; sourceTree = "<group>"; };
+		1489FED024CB0D4400439A24 /* FixaServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaServer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */,
-				1489FED024CB0D4400439A24 /* FixaClient.swift */,
+				1489FED024CB0D4400439A24 /* FixaServer.swift */,
 				1412DEB524D061A300099C5E /* FixaProtocol.swift */,
 				1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */,
 				1489FEC024CB0C9F00439A24 /* ContentView.swift */,
@@ -155,7 +155,7 @@
 				1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */,
 				1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */,
 				1412DEB624D061A300099C5E /* FixaProtocol.swift in Sources */,
-				1489FED124CB0D4400439A24 /* FixaClient.swift in Sources */,
+				1489FED124CB0D4400439A24 /* FixaServer.swift in Sources */,
 				1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
