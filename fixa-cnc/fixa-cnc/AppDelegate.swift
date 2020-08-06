@@ -22,7 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		controlClient = FixaClient()
 		
-		let controlPanelView = BrowserView(availableFixaApps: controlClient.browserResults)
+		let browser = BrowserView(availableFixaApps: controlClient.browserResults)
 
 		// Create the window and set the content view. 
 		window = NSWindow(
@@ -31,11 +31,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		    backing: .buffered, defer: false)
 		window.center()
 		window.setFrameAutosaveName("Main Window")
-		window.contentView = NSHostingView(rootView: controlPanelView)
+		window.contentView = NSHostingView(rootView: browser)
 		window.makeKeyAndOrderFront(nil)
 		
 		controlClient.startBrowsing()
-		connectSubject = controlPanelView.connectSubject
+		connectSubject = browser.connectSubject
 			.sink { (endpoint) in
 				self.controlClient.stopBrowsing()
 				self.controlClient.openConnection(to: endpoint)
