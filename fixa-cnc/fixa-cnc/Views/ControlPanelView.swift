@@ -8,22 +8,35 @@
 
 import SwiftUI
 
+/////////////////// $ Until XCode 12
+struct ActivityIndicator: NSViewRepresentable {
+	typealias NSViewType = NSProgressIndicator
+	func makeNSView(context: Context) -> NSProgressIndicator {
+		let view = NSProgressIndicator()
+		view.isIndeterminate = true
+		view.startAnimation(nil)
+		view.style = .spinning
+		view.controlSize = .small
+		return view
+	}
+	
+	func updateNSView(_ nsView: NSProgressIndicator, context: Context) {
+	}
+}
+//////////////////
+
 struct ControlPanelView: View {
-	let connectedAppName: String
-	let connectedDeviceName: String
+	@ObservedObject var clientState: ClientState
 	
 	var body: some View {
 		VStack {
-			HStack {
-				VStack(alignment: .leading) {
-					Text(connectedAppName).font(.title)
-					Text("on \(connectedDeviceName)").font(.subheadline)
-				}
-				Spacer()
+			if clientState.connecting {
+				ActivityIndicator()
+			} else if clientState.connected {
+				BorderControls(value: 0.5, label: "Continent border")
+				BorderControls(value: 0.25, label: "Country border")
+				BorderControls(value: 0.75, label: "Province border")
 			}
-			BorderControls(label: "Continent border")
-			BorderControls(label: "Country border")
-			BorderControls(label: "Province border")
 			Spacer()
 		}.padding(16.0)
 		 .frame(minWidth: 320.0)
@@ -31,21 +44,32 @@ struct ControlPanelView: View {
 }
 
 struct BorderControls: View {
+	@State private var widthValue: Float
+	@State private var brightnessValue: Float
 	let label: String
 	let sliderWidth: CGFloat = 200.0
+	
+	init(value: Float, label: String) {
+		self.label = label
+		_widthValue = State(initialValue: 10.0 * value)
+		_brightnessValue = State(initialValue: value)
+	}
+	
 	var body: some View {
 		GroupBox(label: Text(label)) {
 			HStack {
 				Text("Width")
 				Spacer()
-				Slider(value: .constant(2.0), in: 0.1 ... 10.0)
+				Slider(value: $widthValue, in: 0.1 ... 10.0)
 					.frame(width: sliderWidth)
 			}
 			HStack {
 				Text("Brightness")
 				Spacer()
-				Slider(value: .constant(0.5), in: 0.0 ... 1.0)
-					.frame(width: sliderWidth)
+				Slider(value: $brightnessValue, in: 0.0 ... 1.0) { val in
+					print("Slider changed: \(val)")
+				}
+				.frame(width: sliderWidth)
 			}
 		}
 		.padding(.top, 16.0)
@@ -54,7 +78,7 @@ struct BorderControls: View {
 
 struct ControlPanelView_Previews: PreviewProvider {
     static var previews: some View {
-			ControlPanelView(connectedAppName: "Connected App", connectedDeviceName: "connected device")
+			ControlPanelView(clientState: ClientState())
 				.frame(width: 400.0, height: 600.0)
     }
 }

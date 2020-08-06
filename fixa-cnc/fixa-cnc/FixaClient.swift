@@ -11,82 +11,29 @@ import Combine
 import Network
 import SwiftUI
 
-struct BrowserResult {
-	let deviceName: String
-	let appName: String
-	let interfaces: String
-	let endpoint: NWEndpoint!
-	
-	init?(_ nwResult: NWBrowser.Result) {
-		guard case .service = nwResult.endpoint else { return nil }
-		guard case .bonjour(let metadata) = nwResult.metadata else { return nil }
-		
-		self.deviceName = metadata.dictionary["deviceName"] ?? "Unknown device"
-		self.appName = metadata.dictionary["appName"] ?? "Unknown app"
-		self.interfaces = nwResult.interfaces.map { interface in
-			switch interface.type {
-				case .wifi: return "wifi"
-				case .loopback: return "local"
-				default: return "other"
-			}
-		}.joined(separator: " ")
-		
-		self.endpoint = nwResult.endpoint
-	}
-}
-
-class BrowserResults: ObservableObject {
-	@Published var browsing: Bool
-	@Published var foundApps: [BrowserResult]
+class ClientState: ObservableObject {
+	@Published var connecting: Bool
+	@Published var connected: Bool
 	
 	init() {
-		self.browsing = true
-		self.foundApps = []
+		connecting = false
+		connected = false
 	}
 }
 
 class FixaClient {
-	let browser: NWBrowser
-	let browserResults: BrowserResults
 	var clientConnection: NWConnection?
+	let clientState: ClientState
 	
 	init() {
-		self.browserResults = BrowserResults()
-		
 		let parameters = NWParameters.tcp
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
-		self.browser = NWBrowser(for: .bonjourWithTXTRecord(type: FixaProtocol.bonjourType, domain: nil), using: parameters)
-	}
-	
-	func startBrowsing() {
-		browser.stateUpdateHandler = { newState in
-			switch newState {
-				case .ready: self.browserResults.browsing = true
-				default: self.browserResults.browsing = false
-			}
-		}
-		
-		browser.browseResultsChangedHandler = { results, changes in
-			print("Browse results updated - \(results.count) visible services")
-			let fixaApps = results.filter { result in
-				if case .service(_, let type, _, _) = result.endpoint, type == FixaProtocol.bonjourType {
-					return true
-				} else {
-					return false
-				}
-			}
-			self.browserResults.foundApps = fixaApps.compactMap { BrowserResult($0) }
-		}
-		
-		browser.start(queue: .main)
-	}
-	
-	func stopBrowsing() {
-		browser.cancel()
+		clientState = ClientState()
 	}
 	
 	func openConnection(to endpoint: NWEndpoint) {
+		clientState.connecting = true
 		let parameters = NWParameters.tcp
 		parameters.prohibitedInterfaceTypes = [.loopback]
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
@@ -95,7 +42,6 @@ class FixaClient {
 		clientConnection?.stateUpdateHandler = { newState in
 			switch newState {
 				case .ready:
-					print("Fixa controller: client is connected to app")
 					self.receiveMessage()
 				default: break
 			}
@@ -109,9 +55,12 @@ class FixaClient {
 			if let error = error {
 				print("Fixa controller: failed to receive message: \(error.localizedDescription)")
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
+				self.clientState.connecting = false
 				switch message.fixaMessageType {
 					case .handshake:
 						print("Fixa controller: received handshake from app: \(String(data: data!, encoding: .unicode) ?? "malformed message")")
+						self.clientState.connected = true
+//						self.messageSubject.send("Handshake")
 					case .invalid:
 						print("Fixa controller: received unknown message type. Ignoring.")
 				}
@@ -121,4 +70,3 @@ class FixaClient {
 		})
 	}
 }
-

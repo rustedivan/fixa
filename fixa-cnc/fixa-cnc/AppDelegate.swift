@@ -14,38 +14,60 @@ import SwiftUI
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-	var window: NSWindow!
-	var timer: DispatchSourceTimer!
-	var controlClient: FixaClient!
+	var browserWindow: NSWindow!
+	var fixaBrowser: FixaBrowser!
 	var connectSubject: AnyCancellable!
 
+	var controlWindow: NSWindow?
+	var controlClient: FixaClient?
+	var messageSubject: AnyCancellable!
+	
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
-		controlClient = FixaClient()
+		fixaBrowser = FixaBrowser()
 		
-		let browser = BrowserView(availableFixaApps: controlClient.browserResults)
+		let browserView = BrowserView(availableFixaApps: fixaBrowser.browserResults)
+		browserWindow = makeBrowserWindow(forView: browserView)
+		
+		connectSubject = browserView.connectSubject
+			.sink { (browserResult) in
+				self.fixaBrowser.stopBrowsing()
+				
+				let controlClient = FixaClient()
+				let controlView = ControlPanelView(clientState: controlClient.clientState)
+				controlClient.openConnection(to: browserResult.endpoint)
+				self.controlClient = controlClient
+				self.controlWindow = self.makeControlWindow(forView: controlView, appName: browserResult.appName, deviceName: browserResult.deviceName)
+			}
+		fixaBrowser.startBrowsing()
+	}
 
-		// Create the window and set the content view. 
-		window = NSWindow(
-		    contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
-		    styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-		    backing: .buffered, defer: false)
+	func makeBrowserWindow(forView browser: BrowserView) -> NSWindow {
+		// Create the window and set the content view.
+		let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
+													styleMask: [.titled, .miniaturizable, .resizable, .fullSizeContentView],
+														backing: .buffered, defer: false)
 		window.center()
 		window.setFrameAutosaveName("Main Window")
 		window.contentView = NSHostingView(rootView: browser)
 		window.makeKeyAndOrderFront(nil)
-		
-		controlClient.startBrowsing()
-		connectSubject = browser.connectSubject
-			.sink { (endpoint) in
-				self.controlClient.stopBrowsing()
-				self.controlClient.openConnection(to: endpoint)
-			}
+		return window
 	}
-
+	
+	func makeControlWindow(forView controlPanel: ControlPanelView, appName: String, deviceName: String) -> NSWindow {
+		// Create the window and set the content view.
+		let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 480, height: 500),
+													styleMask: [.titled, .miniaturizable, .resizable, .fullSizeContentView],
+														backing: .buffered, defer: false)
+		window.center()
+		window.title = "\(appName) on \(deviceName)"
+		window.setFrameAutosaveName("Control Window")
+		window.contentView = NSHostingView(rootView: controlPanel)
+		window.makeKeyAndOrderFront(nil)
+		return window
+	}
+	
+	
 	func applicationWillTerminate(_ aNotification: Notification) {
 		// Insert code here to tear down your application
 	}
-
-
 }
-

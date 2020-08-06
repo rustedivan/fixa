@@ -10,34 +10,14 @@ import SwiftUI
 import Combine
 import Network
 
-/////////////////// $ Until XCode 12
-struct ActivityIndicator: NSViewRepresentable {
-	typealias NSViewType = NSProgressIndicator
-	func makeNSView(context: Context) -> NSProgressIndicator {
-		let view = NSProgressIndicator()
-		view.isIndeterminate = true
-		view.startAnimation(nil)
-		view.style = .spinning
-		view.controlSize = .small
-		return view
-	}
-	
-	func updateNSView(_ nsView: NSProgressIndicator, context: Context) {
-	}
-}
-//////////////////
-
 struct BrowserView: View {
 	@ObservedObject var availableFixaApps: BrowserResults
-	var connectSubject = PassthroughSubject<NWEndpoint, Never>()
+	var connectSubject = PassthroughSubject<BrowserResult, Never>()
 	
 	var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
 				Text("Fixa clients").font(.title)
-				if availableFixaApps.browsing {
-					ActivityIndicator()
-				}
 				List(availableFixaApps.foundApps, id: \.deviceName) { (result) in
 					DeviceCell(device: result) { endpoint in
 						self.connectSubject.send(endpoint)
@@ -56,7 +36,7 @@ struct DeviceCell: View {
 	typealias Failure = Never
 	
 	let device: BrowserResult
-	let callback: (NWEndpoint) -> ()
+	let callback: (BrowserResult) -> ()
 	var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
@@ -65,7 +45,7 @@ struct DeviceCell: View {
 			}
 			Spacer()
 			Button("Connect") {
-				self.callback(self.device.endpoint!)
+				self.callback(self.device)
 			}
 		}
 	}
