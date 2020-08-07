@@ -33,9 +33,9 @@ struct ControlPanelView: View {
 			if clientState.connecting {
 				ActivityIndicator()
 			} else if clientState.connected {
-				BorderControls(value: 0.5, label: "Continent border")
-				BorderControls(value: 0.25, label: "Country border")
-				BorderControls(value: 0.75, label: "Province border")
+				ForEach(Array(clientState.valueDictionary.keys), id: \.self) { (key) in
+					BorderControls(value: self.binding(for: key), label: key)
+				}
 			}
 			Spacer()
 		}.padding(16.0)

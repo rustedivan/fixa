@@ -14,7 +14,8 @@ import SwiftUI
 class ClientState: ObservableObject {
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	
+	@Published var valueDictionary: [String : Float]
+
 	init() {
 		connecting = false
 		connected = false
