@@ -34,25 +34,31 @@ struct ControlPanelView: View {
 				ActivityIndicator()
 			} else if clientState.connected {
 				ForEach(Array(clientState.valueDictionary.keys), id: \.self) { (key) in
-					BorderControls(value: self.binding(for: key), label: key)
+					BorderControls(value: self.dictionaryBinding(for: key), label: key)
 				}
 			}
 			Spacer()
 		}.padding(16.0)
 		 .frame(minWidth: 320.0)
 	}
+	
+	private func dictionaryBinding(for key: String) -> Binding<Float> {
+		return .init(
+			get: { self.clientState.valueDictionary[key, default: 0.0] },
+			set: { self.clientState.valueDictionary[key] = $0 })
+	}
 }
 
 struct BorderControls: View {
-	@State private var widthValue: Float
+	@Binding var widthValue: Float
 	@State private var brightnessValue: Float
 	let label: String
 	let sliderWidth: CGFloat = 200.0
 	
-	init(value: Float, label: String) {
+	init(value: Binding<Float>, label: String) {
 		self.label = label
-		_widthValue = State(initialValue: 10.0 * value)
-		_brightnessValue = State(initialValue: value)
+		_widthValue = value
+		_brightnessValue = State(initialValue: 0.5)
 	}
 	
 	var body: some View {
@@ -66,10 +72,8 @@ struct BorderControls: View {
 			HStack {
 				Text("Brightness")
 				Spacer()
-				Slider(value: $brightnessValue, in: 0.0 ... 1.0) { val in
-					print("Slider changed: \(val)")
-				}
-				.frame(width: sliderWidth)
+				Slider(value: $brightnessValue, in: 0.0 ... 1.0)
+					.frame(width: sliderWidth)
 			}
 		}
 		.padding(.top, 16.0)
@@ -78,7 +82,11 @@ struct BorderControls: View {
 
 struct ControlPanelView_Previews: PreviewProvider {
     static var previews: some View {
-			ControlPanelView(clientState: ClientState())
+			let previewState = ClientState()
+			previewState.connected = true
+			previewState.connecting = false
+			previewState.valueDictionary = ["Slider 1": 0.5, "Slider 2": 5.2]
+			return ControlPanelView(clientState: previewState)
 				.frame(width: 400.0, height: 600.0)
     }
 }

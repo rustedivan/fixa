@@ -19,6 +19,10 @@ class ClientState: ObservableObject {
 	init() {
 		connecting = false
 		connected = false
+		valueDictionary = [
+			"Static slider 1": 1.0,
+			"Static slider 2": 0.5
+		]
 	}
 }
 
@@ -61,7 +65,6 @@ class FixaClient {
 					case .handshake:
 						print("Fixa controller: received handshake from app: \(String(data: data!, encoding: .unicode) ?? "malformed message")")
 						self.clientState.connected = true
-//						self.messageSubject.send("Handshake")
 					case .invalid:
 						print("Fixa controller: received unknown message type. Ignoring.")
 				}
