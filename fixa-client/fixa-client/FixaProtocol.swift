@@ -9,12 +9,60 @@
 import Foundation
 import Network
 
-enum FixaMessageType: UInt32 {
-	case invalid = 0
-	case handshake = 1
+// MARK: Errors
+enum FixaError: Error {
+	case serializationError(String)
 }
 
+// MARK: Network packet serialisation
+enum FixaTweakable: Codable {
+	enum CodingKeys: CodingKey {
+		case range, rangeValue, rangeMin, rangeMax
+	}
+	
+	case none
+	case range(value: Float, min: Float, max: Float)
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+			case .range(let value, let min, let max):
+				var rangeContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .range)
+				try rangeContainer.encode(value, forKey: .rangeValue)
+				try rangeContainer.encode(min, forKey: .rangeMin)
+				try rangeContainer.encode(max, forKey: .rangeMax)
+			case .none:
+				break
+		}
+	}
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		guard let key = container.allKeys.first else {
+			throw FixaError.serializationError("FixaTweakable could not be decoded")
+		}
+		switch key {
+			case .range:
+				let rangeContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .range)
+				let value = try rangeContainer.decode(Float.self, forKey: .rangeValue)
+				let min = try rangeContainer.decode(Float.self, forKey: .rangeMin)
+				let max = try rangeContainer.decode(Float.self, forKey: .rangeMax)
+				self = .range(value: value, min: min, max: max)
+			default:
+				throw FixaError.serializationError("Unexpected \(key) in tweak packet")
+		}
+	}
+}
+
+typealias FixaTweakables = [String : FixaTweakable]
+
+// MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
+	enum MessageType: UInt32 {
+		case invalid = 0
+		case handshake = 1
+	}
+
 	static let bonjourType = "_fixa._tcp"
 	static let definition = NWProtocolFramer.Definition(implementation: FixaProtocol.self)
 	static var label = "Fixa Protocol"
@@ -39,8 +87,8 @@ class FixaProtocol: NWProtocolFramerImplementation {
 			
 			guard parsed, let header = tempHeader else { return headerSize }
 			
-			var messageType = FixaMessageType.invalid
-			if let parsedMessageType = FixaMessageType(rawValue: header.type) {
+			var messageType = FixaProtocol.MessageType.invalid
+			if let parsedMessageType = FixaProtocol.MessageType(rawValue: header.type) {
 				messageType = parsedMessageType
 			}
 			
@@ -66,13 +114,13 @@ class FixaProtocol: NWProtocolFramerImplementation {
 }
 
 extension NWProtocolFramer.Message {
-	convenience init(fixaMessageType: FixaMessageType) {
+	convenience init(fixaMessageType: FixaProtocol.MessageType) {
 		self.init(definition: FixaProtocol.definition)
 		self["FixaMessageType"] = fixaMessageType
 	}
 	
-	var fixaMessageType: FixaMessageType {
-		return (self["FixaMessageType"] as? FixaMessageType) ?? .invalid
+	var fixaMessageType: FixaProtocol.MessageType {
+		return (self["FixaMessageType"] as? FixaProtocol.MessageType) ?? .invalid
 	}
 }
 

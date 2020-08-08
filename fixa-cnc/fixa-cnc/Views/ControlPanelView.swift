@@ -34,7 +34,9 @@ struct ControlPanelView: View {
 				ActivityIndicator()
 			} else if clientState.connected {
 				ForEach(Array(clientState.tweakValues.keys), id: \.self) { (key) in
-					BorderControls(value: self.clientState.tweakValueBinding(for: key), label: key)
+					TweakableController(value: self.clientState.tweakValueBinding(for: key),
+															tweak: self.clientState.tweakValues[key] ?? .none,
+															label: key)
 				}
 			}
 			Spacer()
@@ -43,44 +45,53 @@ struct ControlPanelView: View {
 	}
 }
 
-struct BorderControls: View {
-	@Binding var widthValue: Float
-	@State private var brightnessValue: Float
+struct TweakableController: View {
+	@Binding var tweakValue: Float
+	let tweak: FixaTweakable
 	let label: String
 	let sliderWidth: CGFloat = 200.0
 	
-	init(value: Binding<Float>, label: String) {
+	init(value: Binding<Float>, tweak: FixaTweakable, label: String) {
 		self.label = label
-		_widthValue = value
-		_brightnessValue = State(initialValue: 0.5)
+		_tweakValue = value
+		self.tweak = tweak
 	}
 	
 	var body: some View {
-		GroupBox(label: Text(label)) {
-			HStack {
-				Text("Width")
-				Spacer()
-				Slider(value: $widthValue, in: 0.1 ... 10.0)
-					.frame(width: sliderWidth)
-			}
-			HStack {
-				Text("Brightness")
-				Spacer()
-				Slider(value: $brightnessValue, in: 0.0 ... 1.0)
-					.frame(width: sliderWidth)
-			}
+		return HStack {
+			Text(label)
+			Spacer()
+			buildContent(tweak: tweak)
 		}
-		.padding(.top, 16.0)
+	}
+	
+	// $ XCode12 will allow switch statements in HStack
+	func buildContent(tweak: FixaTweakable) -> AnyView {
+		switch tweak {
+			case .range(_, let min, let max):
+				let slider = Slider(value: $tweakValue,
+														in: min ... max)
+					.frame(width: sliderWidth)
+				let stack = HStack {
+					Text("\(min)")
+					slider
+					Text("\(max)")
+				}
+				return AnyView(stack)
+
+			case .none:
+				return AnyView(Text(label))
+		}
 	}
 }
 
-struct ControlPanelView_Previews: PreviewProvider {
-    static var previews: some View {
-			let previewState = ControllerState()
-			previewState.connected = true
-			previewState.connecting = false
-			previewState.tweakValues = ["Slider 1": 0.5, "Slider 2": 5.2]
-			return ControlPanelView(clientState: previewState)
-				.frame(width: 400.0, height: 600.0)
-    }
-}
+//struct ControlPanelView_Previews: PreviewProvider {
+//    static var previews: some View {
+//			let previewState = ControllerState()
+//			previewState.connected = true
+//			previewState.connecting = false
+//			previewState.tweakValues = ["Slider 1": 0.5, "Slider 2": 5.2]
+//			return ControlPanelView(clientState: previewState)
+//				.frame(width: 400.0, height: 600.0)
+//    }
+//}

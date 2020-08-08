@@ -10,7 +10,8 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-	var fixaServer = FixaServer()
+	var fixaServer = FixaServer(tweakables: ["Angle" : FixaTweakable.range(value: 90.0, min: 0.0, max: 360.0),
+																					 "Size" :  FixaTweakable.range(value: 50.0, min: 1.0, max: 100.0)])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.

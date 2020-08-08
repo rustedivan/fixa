@@ -15,23 +15,33 @@ class ControllerState: ObservableObject {
 	var controllerValueChanged = PassthroughSubject<Void, Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var tweakValues: [String : Float] {
+	@Published var tweakValues: FixaTweakables {
 		didSet { controllerValueChanged.send() }
 	}
 
 	init() {
 		connecting = false
 		connected = false
-		tweakValues = [
-			"Static slider 1": 1.0,
-			"Static slider 2": 0.5
-		]
+		tweakValues = [:]
 	}
 	
 	func tweakValueBinding(for key: String) -> Binding<Float> {
 		return .init(
-			get: { self.tweakValues[key, default: 0.0] },
-			set: { self.tweakValues[key] = $0 })
+			get: {
+				let tweak = self.tweakValues[key, default: .none]
+				switch tweak {
+					case .range(let value, _, _): return value
+					case .none: return 0.0
+				}
+			},
+			set: {
+				let tweak = self.tweakValues[key, default: .none]
+				switch tweak {
+					case .range(_ , let min, let max):
+						self.tweakValues[key] = .range(value: $0, min: min, max: max)
+					case .none: break
+				}
+			})
 	}
 }
 
@@ -77,8 +87,13 @@ class FixaClient {
 				self.clientState.connecting = false
 				switch message.fixaMessageType {
 					case .handshake:
-						print("Fixa controller: received handshake from app: \(String(data: data!, encoding: .unicode) ?? "malformed message")")
-						self.clientState.connected = true
+						if let initialTweakables = self.parseHandshake(handshakeData: data) {
+							self.clientState.tweakValues = initialTweakables
+							self.clientState.connected = true
+							print("Fixa controller: received handshake from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
+						} else {
+							self.clientConnection?.cancel()
+					}
 					case .invalid:
 						print("Fixa controller: received unknown message type. Ignoring.")
 				}
@@ -86,5 +101,19 @@ class FixaClient {
 				self.receiveMessage()
 			}
 		})
+	}
+	
+	private func parseHandshake(handshakeData: Data?) -> FixaTweakables? {
+		guard let handshakeData = handshakeData else {
+			print("Fixa controller: received empty handshake")
+			return nil
+		}
+		
+		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: handshakeData) else {
+			print("Fixa controller: handshake could not be parsed. Disconnecting.")
+			return nil
+		}
+
+		return tweakables
 	}
 }

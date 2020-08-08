@@ -10,10 +10,14 @@ import Foundation
 import Network
 import UIKit
 
-
 class FixaServer {
 	var listener: NWListener!
 	var clientConnection: NWConnection?
+	var tweakableValues: FixaTweakables
+	
+	init(tweakables: FixaTweakables) {
+		self.tweakableValues = tweakables
+	}
 
 	func startListening() {
 		let parameters = NWParameters.tcp
@@ -72,9 +76,19 @@ class FixaServer {
 	func sendHandshake() {
 		let message = NWProtocolFramer.Message(fixaMessageType: .handshake)
 		let context = NWConnection.ContentContext(identifier: "FixaHandshake", metadata: [message])
-		let greeting = "I am \(UIDevice.current.name)".data(using: .unicode)
-		self.clientConnection!.send(content: greeting, contentContext: context, isComplete: true, completion: .contentProcessed { error in
-			print(error ?? "- Message sent.")
+		
+		let setupData: Data
+		do {
+			setupData = try PropertyListEncoder().encode(tweakableValues)
+		} catch let error {
+			print("Could not serialize tweakables dictionary: \(error)")
+			return
+		}
+		
+		self.clientConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
+			if let error = error {
+				print("Could not handshake: \(error)")
+			}
 		})
 	}
 }
