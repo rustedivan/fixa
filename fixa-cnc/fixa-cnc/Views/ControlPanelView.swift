@@ -85,13 +85,16 @@ struct TweakableController: View {
 	}
 }
 
-//struct ControlPanelView_Previews: PreviewProvider {
-//    static var previews: some View {
-//			let previewState = ControllerState()
-//			previewState.connected = true
-//			previewState.connecting = false
-//			previewState.tweakValues = ["Slider 1": 0.5, "Slider 2": 5.2]
-//			return ControlPanelView(clientState: previewState)
-//				.frame(width: 400.0, height: 600.0)
-//    }
-//}
+struct ControlPanelView_Previews: PreviewProvider {
+    static var previews: some View {
+			let previewState = ControllerState()
+			previewState.connected = true
+			previewState.connecting = false
+			previewState.tweakValues = [
+				"Slider 1" : .range(value: 0.2, min: 0.0, max: 1.0),
+				"Slider 2" : .range(value: 90.0, min: 0.0, max: 360.0)
+			]
+			return ControlPanelView(clientState: previewState)
+				.frame(width: 400.0, height: 600.0)
+    }
+}
