@@ -12,9 +12,12 @@ import Network
 import SwiftUI
 
 class ClientState: ObservableObject {
+	var clientValueChanged = PassthroughSubject<Void, Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var valueDictionary: [String : Float]
+	@Published var valueDictionary: [String : Float] {
+		didSet { clientValueChanged.send() }
+	}
 
 	init() {
 		connecting = false
@@ -29,12 +32,17 @@ class ClientState: ObservableObject {
 class FixaClient {
 	var clientConnection: NWConnection?
 	let clientState: ClientState
+	var valueChangedStream: AnyCancellable?
 	
 	init() {
 		let parameters = NWParameters.tcp
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		clientState = ClientState()
+		
+		valueChangedStream = clientState.clientValueChanged
+			.sink {
+			}
 	}
 	
 	func openConnection(to endpoint: NWEndpoint) {
