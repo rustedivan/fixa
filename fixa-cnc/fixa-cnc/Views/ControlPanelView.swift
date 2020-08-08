@@ -26,26 +26,20 @@ struct ActivityIndicator: NSViewRepresentable {
 //////////////////
 
 struct ControlPanelView: View {
-	@ObservedObject var clientState: ClientState
+	@ObservedObject var clientState: ControllerState
 	
 	var body: some View {
 		VStack {
 			if clientState.connecting {
 				ActivityIndicator()
 			} else if clientState.connected {
-				ForEach(Array(clientState.valueDictionary.keys), id: \.self) { (key) in
-					BorderControls(value: self.dictionaryBinding(for: key), label: key)
+				ForEach(Array(clientState.tweakValues.keys), id: \.self) { (key) in
+					BorderControls(value: self.clientState.tweakValueBinding(for: key), label: key)
 				}
 			}
 			Spacer()
 		}.padding(16.0)
 		 .frame(minWidth: 320.0)
-	}
-	
-	private func dictionaryBinding(for key: String) -> Binding<Float> {
-		return .init(
-			get: { self.clientState.valueDictionary[key, default: 0.0] },
-			set: { self.clientState.valueDictionary[key] = $0 })
 	}
 }
 
@@ -82,10 +76,10 @@ struct BorderControls: View {
 
 struct ControlPanelView_Previews: PreviewProvider {
     static var previews: some View {
-			let previewState = ClientState()
+			let previewState = ControllerState()
 			previewState.connected = true
 			previewState.connecting = false
-			previewState.valueDictionary = ["Slider 1": 0.5, "Slider 2": 5.2]
+			previewState.tweakValues = ["Slider 1": 0.5, "Slider 2": 5.2]
 			return ControlPanelView(clientState: previewState)
 				.frame(width: 400.0, height: 600.0)
     }

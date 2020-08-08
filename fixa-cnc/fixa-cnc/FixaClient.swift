@@ -11,36 +11,42 @@ import Combine
 import Network
 import SwiftUI
 
-class ClientState: ObservableObject {
-	var clientValueChanged = PassthroughSubject<Void, Never>()
+class ControllerState: ObservableObject {
+	var controllerValueChanged = PassthroughSubject<Void, Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var valueDictionary: [String : Float] {
-		didSet { clientValueChanged.send() }
+	@Published var tweakValues: [String : Float] {
+		didSet { controllerValueChanged.send() }
 	}
 
 	init() {
 		connecting = false
 		connected = false
-		valueDictionary = [
+		tweakValues = [
 			"Static slider 1": 1.0,
 			"Static slider 2": 0.5
 		]
+	}
+	
+	func tweakValueBinding(for key: String) -> Binding<Float> {
+		return .init(
+			get: { self.tweakValues[key, default: 0.0] },
+			set: { self.tweakValues[key] = $0 })
 	}
 }
 
 class FixaClient {
 	var clientConnection: NWConnection?
-	let clientState: ClientState
+	let clientState: ControllerState
 	var valueChangedStream: AnyCancellable?
 	
 	init() {
 		let parameters = NWParameters.tcp
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
-		clientState = ClientState()
+		clientState = ControllerState()
 		
-		valueChangedStream = clientState.clientValueChanged
+		valueChangedStream = clientState.controllerValueChanged
 			.sink {
 			}
 	}
