@@ -1,8 +1,8 @@
 #  Fixa dotplan
 
 ## POC
-- send tweakables dictionary from server app
-- send tweak messages from control client
+√ send tweakables dictionary from server app
+√ send tweak messages from control client
 - rename to "controller" and "app"
 - disconnect on window close
 - start listener on app resume
@@ -21,3 +21,7 @@
 - undo stack
 - save/restore
 - filter tweaker controls
+- connected icon in status bar or local notification
+- send up app icon
+- event tweaker
+- bool tweaker
