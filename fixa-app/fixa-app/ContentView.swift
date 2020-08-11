@@ -11,9 +11,9 @@ import SwiftUI
 struct ContentView: View {
 	@ObservedObject var envelopeState: VisualEnvelope
 	var body: some View {
-		Image(systemName: envelopeState.open ? "envelope.open.fill" : "envelope.fill")
-			.font(.system(size: CGFloat(envelopeState.size)))
-			.rotationEffect(Angle(degrees: Double(envelopeState.angle)))
+		Image(systemName: Bool(envelopeState.open) ? "envelope.open.fill" : "envelope.fill")
+			.font(.system(size: CGFloat(Float(envelopeState.size))))
+			.rotationEffect(Angle(degrees: Double(Float(envelopeState.angle))))
 	}
 }
 

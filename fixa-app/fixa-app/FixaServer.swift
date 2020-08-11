@@ -86,6 +86,7 @@ class FixaServer {
 			return
 		}
 		
+		// $ This should send the start values set in the model
 		self.clientConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
 			if let error = error {
 				print("Could not handshake: \(error)")

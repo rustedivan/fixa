@@ -35,9 +35,6 @@ struct ControlPanelView: View {
 			} else if clientState.connected {
 				ForEach(Array(clientState.tweakValues.keys), id: \.self) { (key) in
 					self.insertTypedController(self.clientState.tweakValues[key] ?? .none, named: key)
-//					TweakableFloatController(value: self.clientState.tweakValueBinding(for: key),
-//															tweak: self.clientState.tweakValues[key] ?? .none,
-//															label: key)
 				}
 			}
 			Spacer()

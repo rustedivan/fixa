@@ -83,7 +83,6 @@ class TweakableValues {
 	
 	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
 		TweakableValues.shared.bools[name]?.instances.add(instance)
-		print("Registered bool: \(name)")
 	}
 	
 	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {

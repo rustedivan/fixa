@@ -15,33 +15,33 @@ enum Tweakables: String {
 }
 
 class VisualEnvelope: ObservableObject {
-	@Published var size: Float = 10.0
-	@Published var angle: Float = 10.0
-	@Published var open: Bool = false
-	var sizeTweak: TweakableFloat
-	var angleTweak: TweakableFloat
-	var openTweak: TweakableBool
+	@Published var size = TweakableFloat(10.0, name: .size)
+	@Published var angle = TweakableFloat(0.0, name: .angle)
+	@Published var open = TweakableBool(false, name: .open)
 	
 	init() {
-		sizeTweak = TweakableFloat(10.0, name: .size)
-		angleTweak = TweakableFloat(0.0, name: .angle)
-		openTweak = TweakableBool(false, name: .open)
-		
-		sizeTweak.setCallback = { self.size = $0 }
-		angleTweak.setCallback = { self.angle = $0 }
-		openTweak.setCallback = { self.open = $0 }
+		// $ Got to be possible to shorten this
+		size.setCallback = { _ in self.objectWillChange.send() }	// $ setCallback -> didTweak
+		angle.setCallback = { _ in self.objectWillChange.send() }
+		open.setCallback = { _ in self.objectWillChange.send() }
 	}
 }
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
+	
+	// $ forward these to TweakableValues.listenFor
 	var fixaServer = FixaServer(tweakables: [Tweakables.angle.rawValue : FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0),
 																					 Tweakables.size.rawValue :  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0),
 																					 Tweakables.open.rawValue : FixaTweakable.bool(value: false)])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
+		
+		// $ listenForFloat/Bool, don't pass as .float, just take the parameters directly.
+		// $ The value: parameters should be sent in the handshake
+		// $ Move TweakableValues into the FixaServer
 		TweakableValues.listenFor(tweak: .float(value: 5.0, min: 1.0, max: 10.0), named: .size)
 		TweakableValues.listenFor(tweak: .float(value: 90.0, min: 0.0, max: 360.0), named: .angle)
 		TweakableValues.listenFor(tweak: .bool(value: false), named: .open)
