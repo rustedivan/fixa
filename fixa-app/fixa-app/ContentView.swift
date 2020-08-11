@@ -9,15 +9,17 @@
 import SwiftUI
 
 struct ContentView: View {
-	@State private var angle = 0.0
-	@State private var size = 50.0
+	@ObservedObject var envelopeState: VisualEnvelope
 	var body: some View {
-		Image(systemName: "envelope.fill").font(.system(size: CGFloat(size)))
+		Image(systemName: envelopeState.open ? "envelope.open.fill" : "envelope.fill")
+			.font(.system(size: CGFloat(envelopeState.size)))
+			.rotationEffect(Angle(degrees: Double(envelopeState.angle)))
 	}
 }
 
 struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
-			ContentView()
+		let envelopeState = VisualEnvelope()
+		return ContentView(envelopeState: envelopeState)
 	}
 }

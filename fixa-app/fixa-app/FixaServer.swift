@@ -101,7 +101,7 @@ class FixaServer {
 				switch message.fixaMessageType {
 					case .valueUpdates:
 						if let updatedTweakables = self.parseValueUpdate(valueUpdateData: data) {
-							print(updatedTweakables)
+							print("Updated \(updatedTweakables.map { $0.key })")
 						} else {
 							self.clientConnection?.cancel()
 						}
@@ -125,6 +125,17 @@ class FixaServer {
 		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: valueUpdateData) else {
 			print("Fixa app: value update could not be parsed. Disconnecting.")
 			return nil
+		}
+		
+		for updatedTweak in tweakables {
+			guard let tweakName = Tweakables(rawValue: updatedTweak.key) else { continue }
+			switch updatedTweak.value {
+				case .bool(let value):
+					TweakableValues.shared.updateBool(tweakName, to: value)
+				case .float(let value, _, _):
+					TweakableValues.shared.updateFloat(tweakName, to: value)
+				case .none: break
+			}
 		}
 
 		return tweakables

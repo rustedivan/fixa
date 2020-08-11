@@ -11,6 +11,11 @@ import Combine
 import Network
 import SwiftUI
 
+// $ This should not be here, but FixaProtocol file is shared for now
+enum Tweakables {
+	case none
+}
+
 class ControllerState: ObservableObject {
 	var controllerValueChanged = PassthroughSubject<Void, Never>()
 	@Published var connecting: Bool

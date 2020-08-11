@@ -8,13 +8,46 @@
 
 import UIKit
 
+enum Tweakables: String {
+	case size = "Envelope size"
+	case angle = "Envelope angle"
+	case open = "Letter read"
+}
+
+class VisualEnvelope: ObservableObject {
+	@Published var size: Float = 10.0
+	@Published var angle: Float = 10.0
+	@Published var open: Bool = false
+	var sizeTweak: TweakableFloat
+	var angleTweak: TweakableFloat
+	var openTweak: TweakableBool
+	
+	init() {
+		sizeTweak = TweakableFloat(10.0, name: .size)
+		angleTweak = TweakableFloat(0.0, name: .angle)
+		openTweak = TweakableBool(false, name: .open)
+		
+		sizeTweak.setCallback = { self.size = $0 }
+		angleTweak.setCallback = { self.angle = $0 }
+		openTweak.setCallback = { self.open = $0 }
+	}
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-	var fixaServer = FixaServer(tweakables: ["Angle" : FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0),
-																					 "Size" :  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)])
+	var envelope: VisualEnvelope?
+	var fixaServer = FixaServer(tweakables: [Tweakables.angle.rawValue : FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0),
+																					 Tweakables.size.rawValue :  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0),
+																					 Tweakables.open.rawValue : FixaTweakable.bool(value: false)])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
+		TweakableValues.listenFor(tweak: .float(value: 5.0, min: 1.0, max: 10.0), named: .size)
+		TweakableValues.listenFor(tweak: .float(value: 90.0, min: 0.0, max: 360.0), named: .angle)
+		TweakableValues.listenFor(tweak: .bool(value: false), named: .open)
+		
+		envelope = VisualEnvelope()
+		
 		fixaServer.startListening()
 		return true
 	}

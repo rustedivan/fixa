@@ -15,34 +15,93 @@ enum FixaError: Error {
 }
 
 // MARK: App values
-class FixaValue {
-	var value: Float = 0.0
-	var key: String
+class Tweakable<T> {
+	fileprivate var value: T { didSet {
+			setCallback?(value)
+		}
+	}
 	
-	init(_ value: Float, key: String) {
+	var setCallback: ((T) -> ())?
+	
+	init(_ value: T, name: Tweakables, _ callback: ((T) -> ())? = nil) {
 		self.value = value
-		self.key = key
-		FixaValues.shared.register(self, as: key)
+		self.setCallback = callback
+		self.register(as: name)
+	}
+	
+	func register(as name: Tweakables) {
+		switch self {
+			case is TweakableBool: TweakableValues.registerBoolInstance(name, instance: self as! TweakableBool)
+			case is TweakableFloat: TweakableValues.registerFloatInstance(name, instance: self as! TweakableFloat)
+			default: break
+		}
 	}
 }
 
-class FixaValues {
-	private static var _shared: FixaValues? = nil
-	static var shared: FixaValues {
-		get {
-			if let shared = FixaValues._shared {
+// Bool tweakable
+typealias TweakableBool = Tweakable<Bool>
+extension Bool {
+	init(_ tweakable: TweakableBool) {
+		self = tweakable.value
+	}
+}
+
+// Float tweakable
+typealias TweakableFloat = Tweakable<Float>
+extension Float {
+	init(_ tweakable: TweakableFloat) {
+		self = tweakable.value
+	}
+}
+
+class TweakableValues {
+	private static var _shared: TweakableValues?
+	static var shared: TweakableValues { get {	// $ This should be private
+			if let shared = _shared {
 				return shared
 			} else {
-				FixaValues._shared = FixaValues()
-				return FixaValues._shared!
+				_shared = TweakableValues()
+				return _shared!
 			}
 		}
 	}
 	
-	var allTweakableValues: [String : FixaValue] = [:]
+	fileprivate var bools: [Tweakables : (config: FixaTweakable, instances: NSHashTable<TweakableBool>)] = [:]
+	fileprivate var floats: [Tweakables : (config: FixaTweakable, instances: NSHashTable<TweakableFloat>)] = [:]
 	
-	func register(_ fixaValue: FixaValue, as key: String) {
-		allTweakableValues[key] = fixaValue
+	static func listenFor(tweak: FixaTweakable, named name: Tweakables) {
+		let shared = TweakableValues.shared
+		switch tweak {
+			case .bool:
+				shared.bools[name] = (tweak, NSHashTable<TweakableBool>(options: [.weakMemory, .objectPointerPersonality]))
+			case .float:
+				shared.floats[name] = (tweak, NSHashTable<TweakableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+			case .none:
+				break
+		}
+	}
+	
+	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
+		TweakableValues.shared.bools[name]?.instances.add(instance)
+		print("Registered bool: \(name)")
+	}
+	
+	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {
+		TweakableValues.shared.floats[name]?.instances.add(instance)
+	}
+	
+	func updateBool(_ name: Tweakables, to value: Bool) {
+		guard let instances = TweakableValues.shared.bools[name]?.instances.allObjects else { return }
+		for instance in instances {
+			instance.value = value
+		}
+	}
+	
+	func updateFloat(_ name: Tweakables, to value: Float) {
+		guard let instances = TweakableValues.shared.floats[name]?.instances.allObjects else { return }
+		for instance in instances {
+			instance.value = value
+		}
 	}
 }
 
@@ -85,6 +144,10 @@ enum FixaTweakable: Codable {
 				let min = try floatContainer.decode(Float.self, forKey: .floatMin)
 				let max = try floatContainer.decode(Float.self, forKey: .floatMax)
 				self = .float(value: value, min: min, max: max)
+			case .bool:
+				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
+				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
+				self = .bool(value: value)
 			default:
 				throw FixaError.serializationError("Unexpected \(key) in tweak packet")
 		}
