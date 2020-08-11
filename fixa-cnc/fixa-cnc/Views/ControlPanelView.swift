@@ -34,53 +34,73 @@ struct ControlPanelView: View {
 				ActivityIndicator()
 			} else if clientState.connected {
 				ForEach(Array(clientState.tweakValues.keys), id: \.self) { (key) in
-					TweakableController(value: self.clientState.tweakValueBinding(for: key),
-															tweak: self.clientState.tweakValues[key] ?? .none,
-															label: key)
+					self.insertTypedController(self.clientState.tweakValues[key] ?? .none, named: key)
+//					TweakableFloatController(value: self.clientState.tweakValueBinding(for: key),
+//															tweak: self.clientState.tweakValues[key] ?? .none,
+//															label: key)
 				}
 			}
 			Spacer()
 		}.padding(16.0)
 		 .frame(minWidth: 320.0)
 	}
+
+	func insertTypedController(_ tweak: FixaTweakable, named name: String) -> AnyView {
+		let controller: AnyView
+		switch tweak {
+			case .bool:
+				let binding: Binding<Bool> = self.clientState.tweakBoolBinding(for: name)
+				controller = AnyView(TweakableBoolController(value: binding, label: name))
+			case .float(_, let min, let max):
+				let binding: Binding<Float> = self.clientState.tweakFloatBinding(for: name)
+				controller = AnyView(TweakableFloatController(value: binding, min: min, max: max, label: name))
+			case .none:
+				controller = AnyView(Text(name))
+		}
+		
+		return AnyView(HStack {
+			Text(name)
+			Spacer()
+			controller
+		})
+	}
 }
 
-struct TweakableController: View {
-	@Binding var tweakValue: Float
-	let tweak: FixaTweakable
+struct TweakableBoolController: View {
+	@Binding var tweakValue: Bool
 	let label: String
-	let sliderWidth: CGFloat = 200.0
 	
-	init(value: Binding<Float>, tweak: FixaTweakable, label: String) {
+	init(value: Binding<Bool>, label: String) {
 		self.label = label
 		_tweakValue = value
-		self.tweak = tweak
 	}
 	
 	var body: some View {
-		return HStack {
-			Text(label)
-			Spacer()
-			buildContent(tweak: tweak)
-		}
+		Toggle(isOn: $tweakValue) { Text("") }
+	}
+}
+
+struct TweakableFloatController: View {
+	@Binding var tweakValue: Float
+	let min: Float
+	let max: Float
+	let label: String
+	let sliderWidth: CGFloat = 200.0
+	
+	init(value: Binding<Float>, min: Float, max: Float, label: String) {
+		self.label = label
+		_tweakValue = value
+		self.min = min
+		self.max = max
 	}
 	
-	// $ XCode12 will allow switch statements in HStack
-	func buildContent(tweak: FixaTweakable) -> AnyView {
-		switch tweak {
-			case .range(_, let min, let max):
-				let slider = Slider(value: $tweakValue,
-														in: min ... max)
-					.frame(width: sliderWidth)
-				let stack = HStack {
-					Text("\(min)")
-					slider
-					Text("\(max)")
-				}
-				return AnyView(stack)
-
-			case .none:
-				return AnyView(Text(label))
+	var body: some View {
+		let slider = Slider(value: $tweakValue, in: min ... max)
+										.frame(width: sliderWidth)
+		return HStack {
+			Text("\(min)")
+			slider
+			Text("\(max)")
 		}
 	}
 }
@@ -91,8 +111,9 @@ struct ControlPanelView_Previews: PreviewProvider {
 			previewState.connected = true
 			previewState.connecting = false
 			previewState.tweakValues = [
-				"Slider 1" : .range(value: 0.2, min: 0.0, max: 1.0),
-				"Slider 2" : .range(value: 90.0, min: 0.0, max: 360.0)
+				"Slider 1" : .float(value: 0.2, min: 0.0, max: 1.0),
+				"Slider 2" : .float(value: 90.0, min: 0.0, max: 360.0),
+				"Toggle" : .bool(value: true)
 			]
 			return ControlPanelView(clientState: previewState)
 				.frame(width: 400.0, height: 600.0)

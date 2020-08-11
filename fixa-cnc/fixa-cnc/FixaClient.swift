@@ -27,21 +27,37 @@ class ControllerState: ObservableObject {
 		dirtyKeys = []
 	}
 	
-	func tweakValueBinding(for key: String) -> Binding<Float> {
+	func tweakBoolBinding(for key: String) -> Binding<Bool> {
 		return .init(
 			get: {
-				let tweak = self.tweakValues[key, default: .none]
-				switch tweak {
-					case .range(let value, _, _): return value
-					case .none: return 0.0
+				switch self.tweakValues[key, default: .none] {
+					case .bool(let value): return value
+					default: return false
 				}
 			},
 			set: {
-				let tweak = self.tweakValues[key, default: .none]
-				switch tweak {
-					case .range(_ , let min, let max):
-						self.tweakValues[key] = .range(value: $0, min: min, max: max)
-					case .none: break
+				switch self.tweakValues[key, default: .none] {
+					case .bool:
+						self.tweakValues[key] = .bool(value: $0)
+					default: break
+				}
+				self.dirtyKeys.append(key)
+			})
+	}
+	
+	func tweakFloatBinding(for key: String) -> Binding<Float> {
+		return .init(
+			get: {
+				switch self.tweakValues[key, default: .none] {
+					case .float(let value, _, _): return value
+					default: return 0.0
+				}
+			},
+			set: {
+				switch self.tweakValues[key, default: .none] {
+					case .float(_ , let min, let max):
+						self.tweakValues[key] = .float(value: $0, min: min, max: max)
+					default: break
 				}
 				self.dirtyKeys.append(key)
 			})

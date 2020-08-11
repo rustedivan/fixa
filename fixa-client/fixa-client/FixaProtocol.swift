@@ -49,20 +49,25 @@ class FixaValues {
 // MARK: Network packet serialisation
 enum FixaTweakable: Codable {
 	enum CodingKeys: CodingKey {
-		case range, rangeValue, rangeMin, rangeMax
+		case bool, boolValue
+		case float, floatValue, floatMin, floatMax
 	}
 	
 	case none
-	case range(value: Float, min: Float, max: Float)
+	case bool(value: Bool)
+	case float(value: Float, min: Float, max: Float)
 	
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
-			case .range(let value, let min, let max):
-				var rangeContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .range)
-				try rangeContainer.encode(value, forKey: .rangeValue)
-				try rangeContainer.encode(min, forKey: .rangeMin)
-				try rangeContainer.encode(max, forKey: .rangeMax)
+			case .bool(let value):
+				var boolContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
+				try boolContainer.encode(value, forKey: .boolValue)
+			case .float(let value, let min, let max):
+				var floatContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
+				try floatContainer.encode(value, forKey: .floatValue)
+				try floatContainer.encode(min, forKey: .floatMin)
+				try floatContainer.encode(max, forKey: .floatMax)
 			case .none:
 				break
 		}
@@ -74,12 +79,12 @@ enum FixaTweakable: Codable {
 			throw FixaError.serializationError("FixaTweakable could not be decoded")
 		}
 		switch key {
-			case .range:
-				let rangeContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .range)
-				let value = try rangeContainer.decode(Float.self, forKey: .rangeValue)
-				let min = try rangeContainer.decode(Float.self, forKey: .rangeMin)
-				let max = try rangeContainer.decode(Float.self, forKey: .rangeMax)
-				self = .range(value: value, min: min, max: max)
+			case .float:
+				let floatContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
+				let value = try floatContainer.decode(Float.self, forKey: .floatValue)
+				let min = try floatContainer.decode(Float.self, forKey: .floatMin)
+				let max = try floatContainer.decode(Float.self, forKey: .floatMax)
+				self = .float(value: value, min: min, max: max)
 			default:
 				throw FixaError.serializationError("Unexpected \(key) in tweak packet")
 		}
