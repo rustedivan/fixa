@@ -18,11 +18,13 @@ class ControllerState: ObservableObject {
 	@Published var tweakValues: FixaTweakables {
 		didSet { controllerValueChanged.send() }
 	}
+	var dirtyKeys: [String]
 
 	init() {
 		connecting = false
 		connected = false
 		tweakValues = [:]
+		dirtyKeys = []
 	}
 	
 	func tweakValueBinding(for key: String) -> Binding<Float> {
@@ -41,6 +43,7 @@ class ControllerState: ObservableObject {
 						self.tweakValues[key] = .range(value: $0, min: min, max: max)
 					case .none: break
 				}
+				self.dirtyKeys.append(key)
 			})
 	}
 }
@@ -58,6 +61,11 @@ class FixaClient {
 		
 		valueChangedStream = clientState.controllerValueChanged
 			.sink {
+				let dirtyTweakables = self.clientState.tweakValues.filter {
+					self.clientState.dirtyKeys.contains($0.key)
+				}
+				self.sendTweakableUpdates(dirtyTweakables: dirtyTweakables)
+				self.clientState.dirtyKeys = []
 			}
 	}
 	
@@ -93,7 +101,9 @@ class FixaClient {
 							print("Fixa controller: received handshake from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
 						} else {
 							self.clientConnection?.cancel()
-					}
+						}
+					case .valueUpdates:
+						print("// $ Handle updates from the app side")
 					case .invalid:
 						print("Fixa controller: received unknown message type. Ignoring.")
 				}
@@ -115,5 +125,24 @@ class FixaClient {
 		}
 
 		return tweakables
+	}
+	
+	private func sendTweakableUpdates(dirtyTweakables: FixaTweakables) {
+		let message = NWProtocolFramer.Message(fixaMessageType: .valueUpdates)
+		let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
+		
+		let setupData: Data
+		do {
+			setupData = try PropertyListEncoder().encode(dirtyTweakables)
+		} catch let error {
+			print("Could not serialize tweakable updates: \(error)")
+			return
+		}
+		
+		self.clientConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
+			if let error = error {
+				print("Could not update values: \(error)")
+			}
+		})
 	}
 }

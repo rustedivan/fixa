@@ -14,6 +14,38 @@ enum FixaError: Error {
 	case serializationError(String)
 }
 
+// MARK: App values
+class FixaValue {
+	var value: Float = 0.0
+	var key: String
+	
+	init(_ value: Float, key: String) {
+		self.value = value
+		self.key = key
+		FixaValues.shared.register(self, as: key)
+	}
+}
+
+class FixaValues {
+	private static var _shared: FixaValues? = nil
+	static var shared: FixaValues {
+		get {
+			if let shared = FixaValues._shared {
+				return shared
+			} else {
+				FixaValues._shared = FixaValues()
+				return FixaValues._shared!
+			}
+		}
+	}
+	
+	var allTweakableValues: [String : FixaValue] = [:]
+	
+	func register(_ fixaValue: FixaValue, as key: String) {
+		allTweakableValues[key] = fixaValue
+	}
+}
+
 // MARK: Network packet serialisation
 enum FixaTweakable: Codable {
 	enum CodingKeys: CodingKey {
@@ -61,6 +93,7 @@ class FixaProtocol: NWProtocolFramerImplementation {
 	enum MessageType: UInt32 {
 		case invalid = 0
 		case handshake = 1
+		case valueUpdates = 2
 	}
 
 	static let bonjourType = "_fixa._tcp"

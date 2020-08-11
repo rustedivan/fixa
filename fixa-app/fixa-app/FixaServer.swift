@@ -12,7 +12,7 @@ import UIKit
 
 class FixaServer {
 	var listener: NWListener!
-	var clientConnection: NWConnection?
+	var clientConnection: NWConnection?	// $ Fix this name
 	var tweakableValues: FixaTweakables
 	
 	init(tweakables: FixaTweakables) {
@@ -58,6 +58,7 @@ class FixaServer {
 				switch newState {
 					case .ready:
 						print("Fixa app: listening to \(self.clientConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
+						self.receiveMessage()
 						self.sendHandshake()
 					case .failed(let error):
 						print("Fixa app: Connection failed: \(error)")
@@ -90,5 +91,42 @@ class FixaServer {
 				print("Could not handshake: \(error)")
 			}
 		})
+	}
+	
+	func receiveMessage() {
+		clientConnection?.receiveMessage(completion: { (data, context, _, error) in
+			if let error = error {
+				print("Fixa app: failed to receive message: \(error.localizedDescription)")
+			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
+				switch message.fixaMessageType {
+					case .valueUpdates:
+						if let updatedTweakables = self.parseValueUpdate(valueUpdateData: data) {
+							print(updatedTweakables)
+						} else {
+							self.clientConnection?.cancel()
+						}
+					case .handshake:
+						print("Fixa app: got a handshake, that's not expected")
+					case .invalid:
+						print("Fixa controller: received unknown message type. Ignoring.")
+				}
+				
+				self.receiveMessage()
+			}
+		})
+	}
+	
+	private func parseValueUpdate(valueUpdateData: Data?) -> FixaTweakables? {
+		guard let valueUpdateData = valueUpdateData else {
+			print("Fixa app: received empty value update")
+			return nil
+		}
+		
+		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: valueUpdateData) else {
+			print("Fixa app: value update could not be parsed. Disconnecting.")
+			return nil
+		}
+
+		return tweakables
 	}
 }

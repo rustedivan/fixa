@@ -9,13 +9,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        Text("Hello, World!")
-    }
+	@State private var angle = 0.0
+	@State private var size = 50.0
+	var body: some View {
+		Image(systemName: "envelope.fill").font(.system(size: CGFloat(size)))
+	}
 }
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+	static var previews: some View {
+			ContentView()
+	}
 }
