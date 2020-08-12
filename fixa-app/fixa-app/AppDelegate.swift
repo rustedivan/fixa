@@ -31,20 +31,12 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	// $ forward these to TweakableValues.listenFor
-	var fixaServer = FixaServer(tweakables: [Tweakables.angle.rawValue : FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0),
-																					 Tweakables.size.rawValue :  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0),
-																					 Tweakables.open.rawValue : FixaTweakable.bool(value: false)])
+	var fixaServer = FixaServer(tweakDefinitions: [(Tweakables.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
+																								 (Tweakables.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
+																								 (Tweakables.open,  FixaTweakable.bool(value: false))])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
-		
-		// $ listenForFloat/Bool, don't pass as .float, just take the parameters directly.
-		// $ The value: parameters should be sent in the handshake
-		// $ Move TweakableValues into the FixaServer
-		TweakableValues.listenFor(tweak: .float(value: 5.0, min: 1.0, max: 10.0), named: .size)
-		TweakableValues.listenFor(tweak: .float(value: 90.0, min: 0.0, max: 360.0), named: .angle)
-		TweakableValues.listenFor(tweak: .bool(value: false), named: .open)
 		
 		envelope = VisualEnvelope()
 		
@@ -52,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return true
 	}
 	
-	// stop/restart the listener
+	// $ stop/restart the listener
 	
 	// MARK: UISceneSession Lifecycle
 

@@ -14,96 +14,6 @@ enum FixaError: Error {
 	case serializationError(String)
 }
 
-// MARK: App values
-class Tweakable<T> {
-	fileprivate var value: T { didSet {
-			setCallback?(value)
-		}
-	}
-	
-	var setCallback: ((T) -> ())?
-	
-	init(_ value: T, name: Tweakables, _ callback: ((T) -> ())? = nil) {
-		self.value = value
-		self.setCallback = callback
-		self.register(as: name)
-	}
-	
-	func register(as name: Tweakables) {
-		switch self {
-			case is TweakableBool: TweakableValues.registerBoolInstance(name, instance: self as! TweakableBool)
-			case is TweakableFloat: TweakableValues.registerFloatInstance(name, instance: self as! TweakableFloat)
-			default: break
-		}
-	}
-}
-
-// Bool tweakable
-typealias TweakableBool = Tweakable<Bool>
-extension Bool {
-	init(_ tweakable: TweakableBool) {
-		self = tweakable.value
-	}
-}
-
-// Float tweakable
-typealias TweakableFloat = Tweakable<Float>
-extension Float {
-	init(_ tweakable: TweakableFloat) {
-		self = tweakable.value
-	}
-}
-
-class TweakableValues {
-	private static var _shared: TweakableValues?
-	static var shared: TweakableValues { get {	// $ This should be private
-			if let shared = _shared {
-				return shared
-			} else {
-				_shared = TweakableValues()
-				return _shared!
-			}
-		}
-	}
-	
-	fileprivate var bools: [Tweakables : (config: FixaTweakable, instances: NSHashTable<TweakableBool>)] = [:]
-	fileprivate var floats: [Tweakables : (config: FixaTweakable, instances: NSHashTable<TweakableFloat>)] = [:]
-	
-	static func listenFor(tweak: FixaTweakable, named name: Tweakables) {
-		let shared = TweakableValues.shared
-		switch tweak {
-			case .bool:
-				shared.bools[name] = (tweak, NSHashTable<TweakableBool>(options: [.weakMemory, .objectPointerPersonality]))
-			case .float:
-				shared.floats[name] = (tweak, NSHashTable<TweakableFloat>(options: [.weakMemory, .objectPointerPersonality]))
-			case .none:
-				break
-		}
-	}
-	
-	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
-		TweakableValues.shared.bools[name]?.instances.add(instance)
-	}
-	
-	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {
-		TweakableValues.shared.floats[name]?.instances.add(instance)
-	}
-	
-	func updateBool(_ name: Tweakables, to value: Bool) {
-		guard let instances = TweakableValues.shared.bools[name]?.instances.allObjects else { return }
-		for instance in instances {
-			instance.value = value
-		}
-	}
-	
-	func updateFloat(_ name: Tweakables, to value: Float) {
-		guard let instances = TweakableValues.shared.floats[name]?.instances.allObjects else { return }
-		for instance in instances {
-			instance.value = value
-		}
-	}
-}
-
 // MARK: Network packet serialisation
 enum FixaTweakable: Codable {
 	enum CodingKeys: CodingKey {
@@ -161,6 +71,11 @@ class FixaProtocol: NWProtocolFramerImplementation {
 		case invalid = 0
 		case handshake = 1
 		case valueUpdates = 2
+	}
+	
+	struct TweakConfiguration: Codable {
+		let label: String
+		let config: FixaTweakable
 	}
 
 	static let bonjourType = "_fixa._tcp"

@@ -10,13 +10,108 @@ import Foundation
 import Network
 import UIKit
 
+// MARK: App values
+class Tweakable<T> {
+	fileprivate var value: T { didSet {
+			setCallback?(value)
+		}
+	}
+	
+	var setCallback: ((T) -> ())?
+	
+	init(_ value: T, name: Tweakables, _ callback: ((T) -> ())? = nil) {
+		self.value = value
+		self.setCallback = callback
+		self.register(as: name)
+	}
+	
+	func register(as name: Tweakables) {
+		switch self {
+			case is TweakableBool: TweakableValues.registerBoolInstance(name, instance: self as! TweakableBool)
+			case is TweakableFloat: TweakableValues.registerFloatInstance(name, instance: self as! TweakableFloat)
+			default: break
+		}
+	}
+}
+
+// Bool tweakable
+typealias TweakableBool = Tweakable<Bool>
+extension Bool {
+	init(_ tweakable: TweakableBool) {
+		self = tweakable.value
+	}
+}
+
+// Float tweakable
+typealias TweakableFloat = Tweakable<Float>
+extension Float {
+	init(_ tweakable: TweakableFloat) {
+		self = tweakable.value
+	}
+}
+
+class TweakableValues {
+	private static var _shared: TweakableValues?
+	fileprivate static var shared: TweakableValues { get {
+			if let shared = _shared {
+				return shared
+			} else {
+				_shared = TweakableValues()
+				return _shared!
+			}
+		}
+	}
+	
+	fileprivate var bools: [Tweakables : (config: FixaTweakable, label: String, instances: NSHashTable<TweakableBool>)] = [:]
+	fileprivate var floats: [Tweakables : (config: FixaTweakable, label: String, instances: NSHashTable<TweakableFloat>)] = [:]
+	
+	func addTweak(named name: Tweakables, _ tweak: FixaTweakable) {
+		switch tweak {
+			case .bool:
+				bools[name] = (tweak, name.rawValue, NSHashTable<TweakableBool>(options: [.weakMemory, .objectPointerPersonality]))
+			case .float:
+				floats[name] = (tweak, name.rawValue, NSHashTable<TweakableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+			case .none:
+				break
+		}
+	}
+	
+	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
+		TweakableValues.shared.bools[name]?.instances.add(instance)
+	}
+	
+	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {
+		TweakableValues.shared.floats[name]?.instances.add(instance)
+	}
+	
+	func updateBool(_ name: Tweakables, to value: Bool) {
+		guard let instances = TweakableValues.shared.bools[name]?.instances.allObjects else { return }
+		for instance in instances {
+			instance.value = value
+		}
+	}
+	
+	func updateFloat(_ name: Tweakables, to value: Float) {
+		guard let instances = TweakableValues.shared.floats[name]?.instances.allObjects else { return }
+		for instance in instances {
+			instance.value = value
+		}
+	}
+}
+
 class FixaServer {
 	var listener: NWListener!
 	var clientConnection: NWConnection?	// $ Fix this name
-	var tweakableValues: FixaTweakables
+	var tweakConfigurations: FixaTweakables
+	var tweakDictionary: TweakableValues
 	
-	init(tweakables: FixaTweakables) {
-		self.tweakableValues = tweakables
+	init(tweakDefinitions: [(Tweakables, FixaTweakable)]) {
+		self.tweakConfigurations = [:]
+		self.tweakDictionary = TweakableValues.shared
+		for (name, definition) in tweakDefinitions {
+			self.tweakConfigurations[name.rawValue] = definition
+			self.tweakDictionary.addTweak(named: name, definition)
+		}
 	}
 
 	func startListening() {
@@ -80,7 +175,8 @@ class FixaServer {
 		
 		let setupData: Data
 		do {
-			setupData = try PropertyListEncoder().encode(tweakableValues)
+			// $ Send in some kind of order
+			setupData = try PropertyListEncoder().encode(tweakConfigurations)
 		} catch let error {
 			print("Could not serialize tweakables dictionary: \(error)")
 			return

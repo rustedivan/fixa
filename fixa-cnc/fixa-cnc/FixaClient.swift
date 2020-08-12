@@ -93,7 +93,7 @@ class FixaClient {
 	func openConnection(to endpoint: NWEndpoint) {
 		clientState.connecting = true
 		let parameters = NWParameters.tcp
-		parameters.prohibitedInterfaceTypes = [.loopback]
+		parameters.prohibitedInterfaceTypes = [.loopback, .wiredEthernet]
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		clientConnection = NWConnection(to: endpoint, using: parameters)
