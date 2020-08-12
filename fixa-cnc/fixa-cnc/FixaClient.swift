@@ -41,12 +41,12 @@ class ControllerState: ObservableObject {
 				}
 			},
 			set: {
-				switch self.tweakValues[key, default: .none] {
+				self.dirtyKeys.append(key)
+				switch self.tweakValues[key, default: .none] {	// $ fucking if case let syntax
 					case .bool:
 						self.tweakValues[key] = .bool(value: $0)
 					default: break
 				}
-				self.dirtyKeys.append(key)
 			})
 	}
 	
@@ -69,6 +69,7 @@ class ControllerState: ObservableObject {
 	}
 }
 
+// $ Rename
 class FixaClient {
 	var clientConnection: NWConnection?
 	let clientState: ControllerState
@@ -120,6 +121,8 @@ class FixaClient {
 							self.clientState.tweakValues = initialTweakables
 							self.clientState.connected = true
 							print("Fixa controller: received handshake from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
+							print("Fixa controller: synching back to app")
+							self.sendTweakableUpdates(dirtyTweakables: self.clientState.tweakValues)
 						} else {
 							self.clientConnection?.cancel()
 						}

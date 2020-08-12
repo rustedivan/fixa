@@ -16,11 +16,12 @@ enum Tweakables: String {
 
 class VisualEnvelope: ObservableObject {
 	@Published var size = TweakableFloat(10.0, name: .size)
-	@Published var angle = TweakableFloat(0.0, name: .angle)
-	@Published var open = TweakableBool(false, name: .open)
+	@Published var angle = TweakableFloat(90.0, name: .angle)
+	@Published var open = TweakableBool(true, name: .open)
 	
 	init() {
 		// $ Got to be possible to shorten this
+		// $ size.makePublished
 		size.setCallback = { _ in self.objectWillChange.send() }	// $ setCallback -> didTweak
 		angle.setCallback = { _ in self.objectWillChange.send() }
 		open.setCallback = { _ in self.objectWillChange.send() }

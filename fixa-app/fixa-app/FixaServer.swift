@@ -99,6 +99,7 @@ class TweakableValues {
 	}
 }
 
+// $ Rename
 class FixaServer {
 	var listener: NWListener!
 	var clientConnection: NWConnection?	// $ Fix this name
