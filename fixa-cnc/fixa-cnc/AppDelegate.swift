@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	var connectSubject: AnyCancellable!
 
 	var controlWindow: NSWindow?
-	var controlClient: FixaClient?
+	var controlClient: FixaController?
 	var messageSubject: AnyCancellable!
 	
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -32,7 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 			.sink { (browserResult) in
 				self.fixaBrowser.stopBrowsing()
 				
-				let controlClient = FixaClient()
+				let controlClient = FixaController()
 				let controlView = ControlPanelView(clientState: controlClient.clientState)
 				controlClient.openConnection(to: browserResult.endpoint)
 				self.controlClient = controlClient

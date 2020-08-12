@@ -1,5 +1,5 @@
 //
-//  FixaServer.swift
+//  FixaStream.swift
 //  fixa-app
 //
 //  Created by Ivan Milles on 2020-07-24.
@@ -100,7 +100,7 @@ class TweakableValues {
 }
 
 // $ Rename
-class FixaServer {
+class FixaStream {
 	var listener: NWListener!
 	var clientConnection: NWConnection?	// $ Fix this name
 	var tweakConfigurations: FixaTweakables
@@ -123,7 +123,7 @@ class FixaServer {
 		do {
 			listener = try NWListener(using: parameters)
 		} catch let error {
-			print("Fixa app: Could not create listener: \(error.localizedDescription)")
+			print("Fixa stream: Could not create listener: \(error.localizedDescription)")
 			return
 		}
 		
@@ -137,15 +137,15 @@ class FixaServer {
 		
 		listener.stateUpdateHandler = { newState in
 			switch newState {
-				case .ready: print("Fixa app: Listening for control client over TCP...")
-				case .cancelled: print("Fixa app: Stopped listening for connections.")
+				case .ready: print("Fixa stream: Listening for control client over TCP...")
+				case .cancelled: print("Fixa stream: Stopped listening for connections.")
 				default: break
 			}
 		}
 		
 		listener.newConnectionHandler = { (newConnection: NWConnection) in
 			if let oldConnection = self.clientConnection {
-				print("Fixa app: Moving to new connection...")
+				print("Fixa stream: Moving to new connection...")
 				oldConnection.cancel()
 			}
 			
@@ -153,14 +153,14 @@ class FixaServer {
 			self.clientConnection!.stateUpdateHandler = { newState in
 				switch newState {
 					case .ready:
-						print("Fixa app: listening to \(self.clientConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
+						print("Fixa stream: listening to \(self.clientConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
 						self.receiveMessage()
 						self.sendHandshake()
 					case .failed(let error):
-						print("Fixa app: Connection failed: \(error)")
+						print("Fixa stream: Connection failed: \(error)")
 						self.clientConnection!.cancel()
 					case .cancelled:
-						print("Fixa app: Connection was cancelled.")
+						print("Fixa stream: Connection was cancelled.")
 					default: break
 				}
 			}
@@ -194,7 +194,7 @@ class FixaServer {
 	func receiveMessage() {
 		clientConnection?.receiveMessage(completion: { (data, context, _, error) in
 			if let error = error {
-				print("Fixa app: failed to receive message: \(error.localizedDescription)")
+				print("Fixa stream: failed to receive message: \(error.localizedDescription)")
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				switch message.fixaMessageType {
 					case .valueUpdates:
@@ -204,9 +204,9 @@ class FixaServer {
 							self.clientConnection?.cancel()
 						}
 					case .handshake:
-						print("Fixa app: got a handshake, that's not expected")
+						print("Fixa stream: got a handshake, that's not expected")
 					case .invalid:
-						print("Fixa controller: received unknown message type. Ignoring.")
+						print("Fixa stream: received unknown message type. Ignoring.")
 				}
 				
 				self.receiveMessage()
@@ -216,12 +216,12 @@ class FixaServer {
 	
 	private func parseValueUpdate(valueUpdateData: Data?) -> FixaTweakables? {
 		guard let valueUpdateData = valueUpdateData else {
-			print("Fixa app: received empty value update")
+			print("Fixa stream: received empty value update")
 			return nil
 		}
 		
 		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: valueUpdateData) else {
-			print("Fixa app: value update could not be parsed. Disconnecting.")
+			print("Fixa stream: value update could not be parsed. Disconnecting.")
 			return nil
 		}
 		

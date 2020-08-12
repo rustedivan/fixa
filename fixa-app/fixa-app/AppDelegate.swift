@@ -32,7 +32,7 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaServer = FixaServer(tweakDefinitions: [(Tweakables.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
+	var fixaServer = FixaStream(tweakDefinitions: [(Tweakables.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
 																								 (Tweakables.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
 																								 (Tweakables.open,  FixaTweakable.bool(value: false))])
 
