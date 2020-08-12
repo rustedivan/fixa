@@ -21,7 +21,7 @@
 - undo stack
 - save/restore
 - filter tweaker controls
-- connected icon in status bar or local notification
+- connected icon in status bar or local notification or corner overlay
 - send up app icon
 - event tweaker
 - bool tweaker

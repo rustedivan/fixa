@@ -17,7 +17,7 @@ class Tweakable<T> {
 		}
 	}
 	
-	var setCallback: ((T) -> ())?
+	var setCallback: ((T) -> ())?	// $ Remake into a publisher
 	
 	init(_ value: T, name: Tweakables, _ callback: ((T) -> ())? = nil) {
 		self.value = value
@@ -27,8 +27,8 @@ class Tweakable<T> {
 	
 	func register(as name: Tweakables) {
 		switch self {
-			case is TweakableBool: TweakableValues.registerBoolInstance(name, instance: self as! TweakableBool)
-			case is TweakableFloat: TweakableValues.registerFloatInstance(name, instance: self as! TweakableFloat)
+			case is TweakableBool: FixaRepository.registerBoolInstance(name, instance: self as! TweakableBool)
+			case is TweakableFloat: FixaRepository.registerFloatInstance(name, instance: self as! TweakableFloat)
 			default: break
 		}
 	}
@@ -50,13 +50,13 @@ extension Float {
 	}
 }
 
-class TweakableValues {
-	private static var _shared: TweakableValues?
-	fileprivate static var shared: TweakableValues { get {
+fileprivate class FixaRepository {
+	private static var _shared: FixaRepository?
+	fileprivate static var shared: FixaRepository { get {
 			if let shared = _shared {
 				return shared
 			} else {
-				_shared = TweakableValues()
+				_shared = FixaRepository()
 				return _shared!
 			}
 		}
@@ -77,38 +77,37 @@ class TweakableValues {
 	}
 	
 	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
-		TweakableValues.shared.bools[name]?.instances.add(instance)
+		FixaRepository.shared.bools[name]?.instances.add(instance)
 	}
 	
 	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {
-		TweakableValues.shared.floats[name]?.instances.add(instance)
+		FixaRepository.shared.floats[name]?.instances.add(instance)
 	}
 	
 	func updateBool(_ name: Tweakables, to value: Bool) {
-		guard let instances = TweakableValues.shared.bools[name]?.instances.allObjects else { return }
+		guard let instances = FixaRepository.shared.bools[name]?.instances.allObjects else { return }
 		for instance in instances {
 			instance.value = value
 		}
 	}
 	
 	func updateFloat(_ name: Tweakables, to value: Float) {
-		guard let instances = TweakableValues.shared.floats[name]?.instances.allObjects else { return }
+		guard let instances = FixaRepository.shared.floats[name]?.instances.allObjects else { return }
 		for instance in instances {
 			instance.value = value
 		}
 	}
 }
 
-// $ Rename
 class FixaStream {
-	var listener: NWListener!
-	var clientConnection: NWConnection?	// $ Fix this name
-	var tweakConfigurations: FixaTweakables
-	var tweakDictionary: TweakableValues
+	private var listener: NWListener!
+	private var controllerConnection: NWConnection?
+	private var tweakConfigurations: FixaTweakables
+	private var tweakDictionary: FixaRepository
 	
 	init(tweakDefinitions: [(Tweakables, FixaTweakable)]) {
 		self.tweakConfigurations = [:]
-		self.tweakDictionary = TweakableValues.shared
+		self.tweakDictionary = FixaRepository.shared
 		for (name, definition) in tweakDefinitions {
 			self.tweakConfigurations[name.rawValue] = definition
 			self.tweakDictionary.addTweak(named: name, definition)
@@ -144,27 +143,27 @@ class FixaStream {
 		}
 		
 		listener.newConnectionHandler = { (newConnection: NWConnection) in
-			if let oldConnection = self.clientConnection {
+			if let oldConnection = self.controllerConnection {
 				print("Fixa stream: Moving to new connection...")
 				oldConnection.cancel()
 			}
 			
-			self.clientConnection = newConnection
-			self.clientConnection!.stateUpdateHandler = { newState in
+			self.controllerConnection = newConnection
+			self.controllerConnection!.stateUpdateHandler = { newState in
 				switch newState {
 					case .ready:
-						print("Fixa stream: listening to \(self.clientConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
+						print("Fixa stream: listening to \(self.controllerConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
 						self.receiveMessage()
 						self.sendHandshake()
 					case .failed(let error):
 						print("Fixa stream: Connection failed: \(error)")
-						self.clientConnection!.cancel()
+						self.controllerConnection!.cancel()
 					case .cancelled:
 						print("Fixa stream: Connection was cancelled.")
 					default: break
 				}
 			}
-			self.clientConnection!.start(queue: .main)
+			self.controllerConnection!.start(queue: .main)
 		}
 		
 		listener.start(queue: .main)
@@ -183,8 +182,7 @@ class FixaStream {
 			return
 		}
 		
-		// $ This should send the start values set in the model
-		self.clientConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
+		self.controllerConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
 			if let error = error {
 				print("Could not handshake: \(error)")
 			}
@@ -192,7 +190,7 @@ class FixaStream {
 	}
 	
 	func receiveMessage() {
-		clientConnection?.receiveMessage(completion: { (data, context, _, error) in
+		controllerConnection?.receiveMessage(completion: { (data, context, _, error) in
 			if let error = error {
 				print("Fixa stream: failed to receive message: \(error.localizedDescription)")
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
@@ -201,10 +199,10 @@ class FixaStream {
 						if let updatedTweakables = self.parseValueUpdate(valueUpdateData: data) {
 							print("Updated \(updatedTweakables.map { $0.key })")
 						} else {
-							self.clientConnection?.cancel()
+							self.controllerConnection?.cancel()
 						}
 					case .handshake:
-						print("Fixa stream: got a handshake, that's not expected")
+						print("Fixa stream: received handshake. Ignoring.")	// $ Handshake should be named "registration" or something
 					case .invalid:
 						print("Fixa stream: received unknown message type. Ignoring.")
 				}
@@ -229,9 +227,9 @@ class FixaStream {
 			guard let tweakName = Tweakables(rawValue: updatedTweak.key) else { continue }
 			switch updatedTweak.value {
 				case .bool(let value):
-					TweakableValues.shared.updateBool(tweakName, to: value)
+					FixaRepository.shared.updateBool(tweakName, to: value)
 				case .float(let value, _, _):
-					TweakableValues.shared.updateFloat(tweakName, to: value)
+					FixaRepository.shared.updateFloat(tweakName, to: value)
 				case .none: break
 			}
 		}

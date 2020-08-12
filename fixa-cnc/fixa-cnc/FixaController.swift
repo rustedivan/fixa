@@ -121,7 +121,7 @@ class FixaController {
 							self.clientConnection?.cancel()
 						}
 					case .valueUpdates:
-						print("// $ Handle updates from the app side")
+						print("Fixa controller: received upstream value update. Ignoring.")
 					case .invalid:
 						print("Fixa controller: received unknown message type. Ignoring.")
 				}
