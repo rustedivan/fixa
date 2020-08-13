@@ -152,9 +152,9 @@ class FixaStream {
 			self.controllerConnection!.stateUpdateHandler = { newState in
 				switch newState {
 					case .ready:
-						print("Fixa stream: listening to \(self.controllerConnection?.endpoint.debugDescription ?? "no endpoint"). Sending handshake...")
+						print("Fixa stream: listening to \(self.controllerConnection?.endpoint.debugDescription ?? "no endpoint"). Registering tweakables...")
 						self.receiveMessage()
-						self.sendHandshake()
+						self.sendTweakableRegistration()
 					case .failed(let error):
 						print("Fixa stream: Connection failed: \(error)")
 						self.controllerConnection!.cancel()
@@ -169,9 +169,9 @@ class FixaStream {
 		listener.start(queue: .main)
 	}
 	
-	func sendHandshake() {
-		let message = NWProtocolFramer.Message(fixaMessageType: .handshake)
-		let context = NWConnection.ContentContext(identifier: "FixaHandshake", metadata: [message])
+	func sendTweakableRegistration() {
+		let message = NWProtocolFramer.Message(fixaMessageType: .registerTweakables)
+		let context = NWConnection.ContentContext(identifier: "FixaRegistration", metadata: [message])
 		
 		let setupData: Data
 		do {
@@ -184,7 +184,7 @@ class FixaStream {
 		
 		self.controllerConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
 			if let error = error {
-				print("Could not handshake: \(error)")
+				print("Could not register tweakables: \(error)")
 			}
 		})
 	}
@@ -195,16 +195,16 @@ class FixaStream {
 				print("Fixa stream: failed to receive message: \(error.localizedDescription)")
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				switch message.fixaMessageType {
-					case .valueUpdates:
+					case .updateTweakables:
 						if let updatedTweakables = self.parseValueUpdate(valueUpdateData: data) {
 							print("Updated \(updatedTweakables.map { $0.key })")
 						} else {
 							self.controllerConnection?.cancel()
 						}
-					case .handshake:
-						print("Fixa stream: received handshake. Ignoring.")	// $ Handshake should be named "registration" or something
+					// Not valid for stream side
+					case .registerTweakables: fallthrough
 					case .invalid:
-						print("Fixa stream: received unknown message type. Ignoring.")
+						print("Fixa stream: received unknown message type (\(message.fixaMessageType)). Ignoring.")
 				}
 				
 				self.receiveMessage()

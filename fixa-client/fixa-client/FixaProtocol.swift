@@ -69,8 +69,8 @@ typealias FixaTweakables = [String : FixaTweakable]
 class FixaProtocol: NWProtocolFramerImplementation {
 	enum MessageType: UInt32 {
 		case invalid = 0
-		case handshake = 1
-		case valueUpdates = 2
+		case registerTweakables = 1
+		case updateTweakables = 2
 	}
 	
 	struct TweakConfiguration: Codable {

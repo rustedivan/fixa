@@ -110,11 +110,11 @@ class FixaController {
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				self.clientState.connecting = false
 				switch message.fixaMessageType {
-					case .handshake:
-						if let initialTweakables = self.parseHandshake(handshakeData: data) {
+					case .registerTweakables:
+						if let initialTweakables = self.parseRegistration(registrationData: data) {
 							self.clientState.tweakValues = initialTweakables
 							self.clientState.connected = true
-							print("Fixa controller: received handshake from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
+							print("Fixa controller: received registration from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
 							print("Fixa controller: synching back to app")
 							self.sendTweakableUpdates(dirtyTweakables: self.clientState.tweakValues)
 						} else {
@@ -131,14 +131,14 @@ class FixaController {
 		})
 	}
 	
-	private func parseHandshake(handshakeData: Data?) -> FixaTweakables? {
-		guard let handshakeData = handshakeData else {
-			print("Fixa controller: received empty handshake")
+	private func parseRegistration(registrationData: Data?) -> FixaTweakables? {
+		guard let registrationData = registrationData else {
+			print("Fixa controller: received empty registration")
 			return nil
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: handshakeData) else {
-			print("Fixa controller: handshake could not be parsed. Disconnecting.")
+		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: registrationData) else {
+			print("Fixa controller: registration could not be parsed. Disconnecting.")
 			return nil
 		}
 
