@@ -71,6 +71,7 @@ class FixaProtocol: NWProtocolFramerImplementation {
 		case invalid = 0
 		case registerTweakables = 1
 		case updateTweakables = 2
+		case hangUp = 3
 	}
 	
 	struct TweakConfiguration: Codable {

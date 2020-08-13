@@ -160,7 +160,9 @@ class FixaStream {
 						self.controllerConnection!.cancel()
 					case .cancelled:
 						print("Fixa stream: Connection was cancelled.")
-					default: break
+					default:
+						print("Fixa stream: Connection was \(newState)")
+						break
 				}
 			}
 			self.controllerConnection!.start(queue: .main)
@@ -192,7 +194,12 @@ class FixaStream {
 	func receiveMessage() {
 		controllerConnection?.receiveMessage(completion: { (data, context, _, error) in
 			if let error = error {
-				print("Fixa stream: failed to receive message: \(error.localizedDescription)")
+				switch error {
+					case .posix(let errorCode) where errorCode.rawValue == ECANCELED:
+						print("Fixa stream: connection ended.")
+					default:
+						print("Fixa stream: failed to receive message: \(error)")
+				}
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				switch message.fixaMessageType {
 					case .updateTweakables:
@@ -201,6 +208,9 @@ class FixaStream {
 						} else {
 							self.controllerConnection?.cancel()
 						}
+					case .hangUp:
+						print("Fixa stream: controller hung up.")
+						self.controllerConnection?.cancel()
 					// Not valid for stream side
 					case .registerTweakables: fallthrough
 					case .invalid:

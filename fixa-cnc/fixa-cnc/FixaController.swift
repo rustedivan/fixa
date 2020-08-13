@@ -106,7 +106,12 @@ class FixaController {
 	func receiveMessage() {
 		clientConnection?.receiveMessage(completion: { (data, context, _, error) in
 			if let error = error {
-				print("Fixa controller: failed to receive message: \(error.localizedDescription)")
+				switch error {
+					case .posix(let errorCode) where errorCode.rawValue == ECANCELED:
+						print("Fixa controller: connection ended.")
+					default:
+						print("Fixa controller: failed to receive message: \(error)")
+				}
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				self.clientState.connecting = false
 				switch message.fixaMessageType {
@@ -120,10 +125,12 @@ class FixaController {
 						} else {
 							self.clientConnection?.cancel()
 						}
-					case .valueUpdates:
-						print("Fixa controller: received upstream value update. Ignoring.")
+					case .hangUp:
+						print("Fixa controller: app hung up.")
+						self.clientConnection?.cancel()
+					case .updateTweakables: fallthrough
 					case .invalid:
-						print("Fixa controller: received unknown message type. Ignoring.")
+						print("Fixa controller: received unknown message type (\(message.fixaMessageType)). Ignoring.")
 				}
 				
 				self.receiveMessage()
@@ -146,7 +153,7 @@ class FixaController {
 	}
 	
 	private func sendTweakableUpdates(dirtyTweakables: FixaTweakables) {
-		let message = NWProtocolFramer.Message(fixaMessageType: .valueUpdates)
+		let message = NWProtocolFramer.Message(fixaMessageType: .updateTweakables)
 		let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
 		
 		let setupData: Data
@@ -161,6 +168,15 @@ class FixaController {
 			if let error = error {
 				print("Could not update values: \(error)")
 			}
+		})
+	}
+	
+	func hangUp() {
+		let message = NWProtocolFramer.Message(fixaMessageType: .hangUp)
+		let context = NWConnection.ContentContext(identifier: "FixaHangup", metadata: [message])
+		
+		self.clientConnection!.send(content: nil, contentContext: context, isComplete: true, completion: .contentProcessed { error in
+			self.clientConnection!.cancel()
 		})
 	}
 }

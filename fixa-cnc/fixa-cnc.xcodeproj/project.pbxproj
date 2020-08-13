@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1409032224CCBA13000440FD /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1409032124CCBA13000440FD /* BrowserView.swift */; };
+		140DB33A24E5A16800BD815D /* FixaCnCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140DB33924E5A16800BD815D /* FixaCnCApp.swift */; };
 		1412DEB824D061AA00099C5E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1412DEB724D061AA00099C5E /* FixaProtocol.swift */; };
 		14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13324CACC2D007DD082 /* AppDelegate.swift */; };
 		14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ControlPanelView.swift */; };
@@ -31,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		1409032124CCBA13000440FD /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
+		140DB33924E5A16800BD815D /* FixaCnCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaCnCApp.swift; sourceTree = "<group>"; };
 		1412DEB724D061AA00099C5E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = "../../fixa-client/fixa-client/FixaProtocol.swift"; sourceTree = "<group>"; };
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 		14D2B13224CACC2D007DD082 /* fixa-cnc */ = {
 			isa = PBXGroup;
 			children = (
+				140DB33924E5A16800BD815D /* FixaCnCApp.swift */,
 				14D2B13324CACC2D007DD082 /* AppDelegate.swift */,
 				14E366F824DBFA2E007871B1 /* FixaBrowser.swift */,
 				14D2B17824CB028B007DD082 /* FixaController.swift */,
@@ -231,6 +234,7 @@
 				14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */,
 				1412DEB824D061AA00099C5E /* FixaProtocol.swift in Sources */,
 				14D2B17924CB028B007DD082 /* FixaController.swift in Sources */,
+				140DB33A24E5A16800BD815D /* FixaCnCApp.swift in Sources */,
 				14E366F924DBFA2E007871B1 /* FixaBrowser.swift in Sources */,
 				1409032224CCBA13000440FD /* BrowserView.swift in Sources */,
 			);
