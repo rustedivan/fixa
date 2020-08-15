@@ -4,7 +4,7 @@
 √ send tweakables dictionary from server app
 √ send tweak messages from control client
 √ rename to "controller" and "app"
-- disconnect on window close
+√ disconnect on window close
 - start listener on app resume
 - figure out RAII-style registration with app dictionary 
 - merge down to public main

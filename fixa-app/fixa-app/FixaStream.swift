@@ -138,7 +138,7 @@ class FixaStream {
 			switch newState {
 				case .ready: print("Fixa stream: Listening for control client over TCP...")
 				case .cancelled: print("Fixa stream: Stopped listening for connections.")
-				default: break
+				default: print("Fixa stream: unhandled state transition to \(newState)")
 			}
 		}
 		
