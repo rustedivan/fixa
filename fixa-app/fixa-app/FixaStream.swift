@@ -8,10 +8,10 @@
 
 import Foundation
 import Network
-import UIKit
+import UIKit.UIDevice
 
 // MARK: App values
-class Tweakable<T> {
+class Fixable<T> {
 	fileprivate var value: T { didSet {
 			setCallback?(value)
 		}
@@ -19,82 +19,71 @@ class Tweakable<T> {
 	
 	var setCallback: ((T) -> ())?	// $ Remake into a publisher
 	
-	init(_ value: T, name: Tweakables, _ callback: ((T) -> ())? = nil) {
+	init(_ value: T, name: FixableName, _ callback: ((T) -> ())? = nil) {
 		self.value = value
 		self.setCallback = callback
 		self.register(as: name)
 	}
 	
-	func register(as name: Tweakables) {
-		switch self {
-			case is TweakableBool: FixaRepository.registerBoolInstance(name, instance: self as! TweakableBool)
-			case is TweakableFloat: FixaRepository.registerFloatInstance(name, instance: self as! TweakableFloat)
-			default: break
-		}
+	func register(as name: FixableName) {
+		FixaRepository.registerInstance(name, instance: self)
 	}
 }
 
 // Bool tweakable
-typealias TweakableBool = Tweakable<Bool>
+typealias FixableBool = Fixable<Bool>
 extension Bool {
-	init(_ tweakable: TweakableBool) {
+	init(_ tweakable: FixableBool) {
 		self = tweakable.value
 	}
 }
 
 // Float tweakable
-typealias TweakableFloat = Tweakable<Float>
+typealias FixableFloat = Fixable<Float>
 extension Float {
-	init(_ tweakable: TweakableFloat) {
+	init(_ tweakable: FixableFloat) {
 		self = tweakable.value
 	}
 }
 
 fileprivate class FixaRepository {
 	private static var _shared: FixaRepository?
-	fileprivate static var shared: FixaRepository { get {
-			if let shared = _shared {
-				return shared
-			} else {
-				_shared = FixaRepository()
-				return _shared!
-			}
-		}
-	}
+	fileprivate static let shared = FixaRepository()
 	
-	fileprivate var bools: [Tweakables : (config: FixaTweakable, label: String, instances: NSHashTable<TweakableBool>)] = [:]
-	fileprivate var floats: [Tweakables : (config: FixaTweakable, label: String, instances: NSHashTable<TweakableFloat>)] = [:]
+	fileprivate var bools: [FixableName : (config: FixaTweakable, label: String, instances: NSHashTable<FixableBool>)] = [:]
+	fileprivate var floats: [FixableName : (config: FixaTweakable, label: String, instances: NSHashTable<FixableFloat>)] = [:]
 	
-	func addTweak(named name: Tweakables, _ tweak: FixaTweakable) {
+	func addTweak(named name: FixableName, _ tweak: FixaTweakable) {
 		switch tweak {
 			case .bool:
-				bools[name] = (tweak, name.rawValue, NSHashTable<TweakableBool>(options: [.weakMemory, .objectPointerPersonality]))
+				bools[name] = (tweak, name.rawValue, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
-				floats[name] = (tweak, name.rawValue, NSHashTable<TweakableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+				floats[name] = (tweak, name.rawValue, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
 			case .none:
 				break
 		}
 	}
 	
-	static func registerBoolInstance(_ name: Tweakables, instance: TweakableBool) {
-		FixaRepository.shared.bools[name]?.instances.add(instance)
-	}
-	
-	static func registerFloatInstance(_ name: Tweakables, instance: TweakableFloat) {
-		FixaRepository.shared.floats[name]?.instances.add(instance)
-	}
-	
-	func updateBool(_ name: Tweakables, to value: Bool) {
-		guard let instances = FixaRepository.shared.bools[name]?.instances.allObjects else { return }
-		for instance in instances {
-			instance.value = value
+	static func registerInstance<T>(_ name: FixableName, instance: Fixable<T>) {
+		switch instance {
+			case let boolInstance as FixableBool:
+				FixaRepository.shared.bools[name]?.instances.add(boolInstance)
+			case let floatInstance as FixableFloat:
+				FixaRepository.shared.floats[name]?.instances.add(floatInstance)
+			default: break
 		}
 	}
 	
-	func updateFloat(_ name: Tweakables, to value: Float) {
-		guard let instances = FixaRepository.shared.floats[name]?.instances.allObjects else { return }
-		for instance in instances {
-			instance.value = value
+	func updateValue(_ name: FixableName, to value: FixaTweakable) {
+		let repository = FixaRepository.shared
+		switch value {
+			case .bool(let value):
+				guard let instances = repository.bools[name]?.instances.allObjects else { return }
+				_ = instances.map { $0.value = value }
+			case .float(let value, _, _):
+				guard let instances = repository.floats[name]?.instances.allObjects else { return }
+				_ = instances.map { $0.value = value }
+			case .none: break
 		}
 	}
 }
@@ -105,7 +94,7 @@ class FixaStream {
 	private var tweakConfigurations: FixaTweakables
 	private var tweakDictionary: FixaRepository
 	
-	init(tweakDefinitions: [(Tweakables, FixaTweakable)]) {
+	init(tweakDefinitions: [(FixableName, FixaTweakable)]) {
 		self.tweakConfigurations = [:]
 		self.tweakDictionary = FixaRepository.shared
 		for (name, definition) in tweakDefinitions {
@@ -234,14 +223,8 @@ class FixaStream {
 		}
 		
 		for updatedTweak in tweakables {
-			guard let tweakName = Tweakables(rawValue: updatedTweak.key) else { continue }
-			switch updatedTweak.value {
-				case .bool(let value):
-					FixaRepository.shared.updateBool(tweakName, to: value)
-				case .float(let value, _, _):
-					FixaRepository.shared.updateFloat(tweakName, to: value)
-				case .none: break
-			}
+			guard let tweakName = FixableName(rawValue: updatedTweak.key) else { continue }
+			FixaRepository.shared.updateValue(tweakName, to: updatedTweak.value)
 		}
 
 		return tweakables

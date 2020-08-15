@@ -12,11 +12,11 @@ import Network
 import SwiftUI
 
 class ControllerState: ObservableObject {
-	var controllerValueChanged = PassthroughSubject<Void, Never>()
+	var controllerValueChanged = PassthroughSubject<[String], Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
 	@Published var tweakValues: FixaTweakables {
-		didSet { controllerValueChanged.send() }
+		didSet { controllerValueChanged.send(dirtyKeys) }
 	}
 	var dirtyKeys: [String]
 
@@ -30,55 +30,51 @@ class ControllerState: ObservableObject {
 	func tweakBoolBinding(for key: String) -> Binding<Bool> {
 		return .init(
 			get: {
-				switch self.tweakValues[key, default: .none] {
-					case .bool(let value): return value
-					default: return false
-				}
+				guard case let .bool(value) = self.tweakValues[key] else { return false }
+				return value
 			},
 			set: {
-				self.dirtyKeys.append(key)
-				switch self.tweakValues[key, default: .none] {	// $ fucking if case let syntax
-					case .bool:
-						self.tweakValues[key] = .bool(value: $0)
-					default: break
-				}
+				guard case .bool = self.tweakValues[key] else { return }
+				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
+				self.tweakValues[key] = .bool(value: $0)
 			})
 	}
 	
 	func tweakFloatBinding(for key: String) -> Binding<Float> {
 		return .init(
 			get: {
-				switch self.tweakValues[key, default: .none] {
-					case .float(let value, _, _): return value
-					default: return 0.0
-				}
+				guard case let .float(value, _, _) = self.tweakValues[key] else { return 0.0 }
+				return value
 			},
 			set: {
-				switch self.tweakValues[key, default: .none] {
-					case .float(_ , let min, let max):
-						self.tweakValues[key] = .float(value: $0, min: min, max: max)
-					default: break
-				}
-				self.dirtyKeys.append(key)
+				guard case .float(_, let min, let max) = self.tweakValues[key] else { return }
+				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
+				self.tweakValues[key] = .float(value: $0, min: min, max: max)
 			})
 	}
 }
 
 class FixaController {
+	enum SendFrequency: Double {
+		case immediately = 0.0
+		case normal = 0.02
+		case careful = 0.5
+	}
 	var clientConnection: NWConnection?
 	let clientState: ControllerState
 	var valueChangedStream: AnyCancellable?
 	
-	init() {
+	init(frequency: SendFrequency) {
 		let parameters = NWParameters.tcp
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		clientState = ControllerState()
 		
 		valueChangedStream = clientState.controllerValueChanged
-			.sink {
+			.throttle(for: .seconds(frequency.rawValue), scheduler: DispatchQueue.main, latest: true)
+			.sink { dirtyKeys in
 				let dirtyTweakables = self.clientState.tweakValues.filter {
-					self.clientState.dirtyKeys.contains($0.key)
+					dirtyKeys.contains($0.key)
 				}
 				self.sendTweakableUpdates(dirtyTweakables: dirtyTweakables)
 				self.clientState.dirtyKeys = []
@@ -128,6 +124,7 @@ class FixaController {
 					case .hangUp:
 						print("Fixa controller: app hung up.")
 						self.clientConnection?.cancel()
+						self.clientState.connected = false
 					case .updateTweakables: fallthrough
 					case .invalid:
 						print("Fixa controller: received unknown message type (\(message.fixaMessageType)). Ignoring.")

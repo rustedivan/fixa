@@ -31,7 +31,7 @@ class FixaCnCApp: NSObject, NSWindowDelegate {
 	}
 	
 	func connectController(to result: BrowserResult) {
-		controlClient = FixaController()
+		controlClient = FixaController(frequency: .normal)
 		let controlView = ControlPanelView(clientState: controlClient!.clientState)
 		
 		controlClient!.openConnection(to: result.endpoint)

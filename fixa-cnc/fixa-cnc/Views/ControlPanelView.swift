@@ -46,10 +46,10 @@ struct ControlPanelView: View {
 		let controller: AnyView
 		switch tweak {
 			case .bool:
-				let binding: Binding<Bool> = self.clientState.tweakBoolBinding(for: name)
+				let binding = self.clientState.tweakBoolBinding(for: name)
 				controller = AnyView(TweakableBoolController(value: binding, label: name))
 			case .float(_, let min, let max):
-				let binding: Binding<Float> = self.clientState.tweakFloatBinding(for: name)
+				let binding = self.clientState.tweakFloatBinding(for: name)
 				controller = AnyView(TweakableFloatController(value: binding, min: min, max: max, label: name))
 			case .none:
 				controller = AnyView(Text(name))

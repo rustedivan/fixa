@@ -8,16 +8,16 @@
 
 import UIKit
 
-enum Tweakables: String {
+enum FixableName: String {
 	case size = "Envelope size"
 	case angle = "Envelope angle"
 	case open = "Letter read"
 }
 
 class VisualEnvelope: ObservableObject {
-	@Published var size = TweakableFloat(10.0, name: .size)
-	@Published var angle = TweakableFloat(90.0, name: .angle)
-	@Published var open = TweakableBool(true, name: .open)
+	@Published var size = FixableFloat(10.0, name: .size)
+	@Published var angle = FixableFloat(90.0, name: .angle)
+	@Published var open = FixableBool(true, name: .open)
 	
 	init() {
 		// $ Got to be possible to shorten this
@@ -32,16 +32,16 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaServer = FixaStream(tweakDefinitions: [(Tweakables.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
-																								 (Tweakables.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
-																								 (Tweakables.open,  FixaTweakable.bool(value: false))])
+	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
+																								 (FixableName.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
+																								 (FixableName.open,  FixaTweakable.bool(value: false))])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
 		
 		envelope = VisualEnvelope()
 		
-		fixaServer.startListening()
+		fixaStream.startListening()
 		return true
 	}
 	
