@@ -6,7 +6,10 @@
 √ rename to "controller" and "app"
 √ disconnect on window close
 - start listener on app resume
-- figure out RAII-style registration with app dictionary 
+√ figure out RAII-style registration with app dictionary
+- publisher instead of setCallback
+- inObservableObject
+- clean up into framework
 - merge down to public main
 
 ## Features
