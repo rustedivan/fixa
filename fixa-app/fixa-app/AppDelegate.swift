@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 enum FixableName: String {
 	case size = "Envelope size"
@@ -18,13 +19,15 @@ class VisualEnvelope: ObservableObject {
 	@Published var size = FixableFloat(10.0, name: .size)
 	@Published var angle = FixableFloat(90.0, name: .angle)
 	@Published var open = FixableBool(true, name: .open)
+	var sizeSubject: AnyCancellable? = nil
+	var angleSubject: AnyCancellable? = nil
+	var openSubject: AnyCancellable? = nil
 	
 	init() {
-		// $ Got to be possible to shorten this
-		// $ size.makePublished
-		size.setCallback = { _ in self.objectWillChange.send() }	// $ setCallback -> didTweak
-		angle.setCallback = { _ in self.objectWillChange.send() }
-		open.setCallback = { _ in self.objectWillChange.send() }
+		// $ Future: assign(to: self.objectWillChange)
+		sizeSubject = size.newValues.sink { _ in self.objectWillChange.send() }
+		angleSubject = angle.newValues.sink { _ in self.objectWillChange.send() }
+		openSubject = open.newValues.sink { _ in self.objectWillChange.send() }
 	}
 }
 

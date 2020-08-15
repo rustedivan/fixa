@@ -7,21 +7,22 @@
 //
 
 import Foundation
+import Combine
 import Network
 import UIKit.UIDevice
 
 // MARK: App values
 class Fixable<T> {
-	fileprivate var value: T { didSet {
-			setCallback?(value)
+	var value: T { didSet {
+			newValues.send(value)
 		}
 	}
 	
-	var setCallback: ((T) -> ())?	// $ Remake into a publisher
+	var newValues: PassthroughSubject<T, Never>
 	
-	init(_ value: T, name: FixableName, _ callback: ((T) -> ())? = nil) {
+	init(_ value: T, name: FixableName) {
 		self.value = value
-		self.setCallback = callback
+		self.newValues = PassthroughSubject<T, Never>()
 		self.register(as: name)
 	}
 	
@@ -192,9 +193,7 @@ class FixaStream {
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				switch message.fixaMessageType {
 					case .updateTweakables:
-						if let updatedTweakables = self.parseValueUpdate(valueUpdateData: data) {
-							print("Updated \(updatedTweakables.map { $0.key })")
-						} else {
+						if !self.applyValueUpdate(valueUpdateData: data) {
 							self.controllerConnection?.cancel()
 						}
 					case .hangUp:
@@ -211,15 +210,15 @@ class FixaStream {
 		})
 	}
 	
-	private func parseValueUpdate(valueUpdateData: Data?) -> FixaTweakables? {
+	private func applyValueUpdate(valueUpdateData: Data?) -> Bool {
 		guard let valueUpdateData = valueUpdateData else {
 			print("Fixa stream: received empty value update")
-			return nil
+			return false
 		}
 		
 		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: valueUpdateData) else {
 			print("Fixa stream: value update could not be parsed. Disconnecting.")
-			return nil
+			return false
 		}
 		
 		for updatedTweak in tweakables {
@@ -227,6 +226,6 @@ class FixaStream {
 			FixaRepository.shared.updateValue(tweakName, to: updatedTweak.value)
 		}
 
-		return tweakables
+		return true
 	}
 }

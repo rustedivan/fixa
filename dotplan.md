@@ -7,7 +7,7 @@
 √ disconnect on window close
 - start listener on app resume
 √ figure out RAII-style registration with app dictionary
-- publisher instead of setCallback
+√ publisher instead of setCallback
 - inObservableObject
 - clean up into framework
 - merge down to public main
