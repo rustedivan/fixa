@@ -10,7 +10,7 @@
 √ publisher instead of setCallback
 √ FixableName cannot be an enum (can't cross package boundary)
 - inObservableObject
-- clean up into framework
+√ clean up into framework
 - merge down to public main
 
 ## Features

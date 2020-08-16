@@ -11,6 +11,7 @@ import Combine
 
 import Fixa
 
+// % Declare the set of fixable values
 extension FixableName {
 	static let size = "Envelope size"
 	static let angle = "Envelope angle"
@@ -18,8 +19,8 @@ extension FixableName {
 }
 
 class VisualEnvelope: ObservableObject {
-	@Published var size = FixableFloat(10.0, name: FixableName.size)
-	@Published var angle = FixableFloat(90.0, name: FixableName.angle)
+	@Published var size = FixableFloat(10.0, name: FixableName.size)		// % Wrap the variable instances by type and name
+	@Published var angle = FixableFloat(90.0, name: FixableName.angle)	// $ Can it be trusted to read the default value from the repo?
 	@Published var open = FixableBool(true, name: FixableName.open)
 	var sizeSubject: AnyCancellable? = nil
 	var angleSubject: AnyCancellable? = nil
@@ -37,7 +38,7 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixaTweakable.float(value: 00.0, min: 0.0, max: 360.0)),
+	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixaTweakable.float(value:  0.0, min:  0.0, max: 360.0)),
 																								 (FixableName.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
 																								 (FixableName.open,  FixaTweakable.bool(value: false))])
 
