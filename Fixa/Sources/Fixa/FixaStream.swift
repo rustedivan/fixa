@@ -22,13 +22,29 @@ public class Fixable<T> {
 	
 	public var newValues: PassthroughSubject<T, Never>
 	
-	public init(_ value: T, name: FixableName.Label) {
-		self.value = value
+	public init(_ setup: FixableSetup) {
+		do {
+			switch setup.config {
+				case .bool(let value) where value is T:
+					self.value = value as! T
+				case .float(let value, _, _) where value is T:
+					self.value = value as! T
+				case .none:
+					throw(FixaError.typeError("Fixable \(setup.label) was setup with FixableConfig.none"))
+				default:
+					throw(FixaError.typeError("Fixable \"\(setup.label)\" is of type \(T.self) but was setup with \(setup.config)"))
+			}
+		} catch let error as FixaError {
+			fatalError(error.errorDescription)
+		} catch {
+			fatalError(error.localizedDescription)
+		}
+		
 		self.newValues = PassthroughSubject<T, Never>()
-		self.register(as: name)
+		self.register(as: setup.label)
 	}
 	
-	func register(as name: FixableName.Label) {
+	func register(as name: FixableSetup.Label) {
 		FixaRepository.registerInstance(name, instance: self)
 	}
 }
@@ -53,21 +69,21 @@ fileprivate class FixaRepository {
 	private static var _shared: FixaRepository?
 	fileprivate static let shared = FixaRepository()
 	
-	fileprivate var bools: [FixableName.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
-	fileprivate var floats: [FixableName.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
+	fileprivate var bools: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
+	fileprivate var floats: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
 	
-	func addTweak(named name: FixableName.Label, _ tweak: FixableConfig) {
-		switch tweak {
+	func addTweak(_ setup: FixableSetup) {
+		switch setup.config {
 			case .bool:
-				bools[name] = (tweak, name, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
+				bools[setup.label] = (setup.config, setup.label, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
-				floats[name] = (tweak, name, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+				floats[setup.label] = (setup.config, setup.label, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
 			case .none:
 				break
 		}
 	}
 	
-	static func registerInstance<T>(_ name: FixableName.Label, instance: Fixable<T>) {
+	static func registerInstance<T>(_ name: FixableSetup.Label, instance: Fixable<T>) {
 		switch instance {
 			case let boolInstance as FixableBool:
 				FixaRepository.shared.bools[name]?.instances.add(boolInstance)
@@ -77,7 +93,7 @@ fileprivate class FixaRepository {
 		}
 	}
 	
-	func updateValue(_ name: FixableName.Label, to value: FixableConfig) {
+	func updateFixable(_ name: FixableSetup.Label, to value: FixableConfig) {
 		let repository = FixaRepository.shared
 		switch value {
 			case .bool(let value):
@@ -94,15 +110,17 @@ fileprivate class FixaRepository {
 public class FixaStream {
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
-	private var tweakConfigurations: FixableConfigs
+	private var tweakConfigurations: [FixableSetup.Label : FixableConfig]
 	private var tweakDictionary: FixaRepository
 	
-	public init(tweakDefinitions: [(FixableName.Label, FixableConfig)]) {
+	public init(tweakDefinitions: [FixableSetup]) {	// $ rename
 		self.tweakConfigurations = [:]
 		self.tweakDictionary = FixaRepository.shared
-		for (name, definition) in tweakDefinitions {
-			self.tweakConfigurations[name] = definition
-			self.tweakDictionary.addTweak(named: name, definition)
+		
+		// $ Add the fixables' indices here
+		for definition in tweakDefinitions {
+			self.tweakConfigurations[definition.label] = definition.config
+			self.tweakDictionary.addTweak(definition)
 		}
 	}
 
@@ -223,13 +241,13 @@ public class FixaStream {
 			return false
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode(FixableConfigs.self, from: valueUpdateData) else {
+		guard let fixables = try? PropertyListDecoder().decode([FixableSetup.Label : FixableConfig].self, from: valueUpdateData) else {
 			print("Fixa stream: value update could not be parsed. Disconnecting.")
 			return false
 		}
 		
-		for updatedTweak in tweakables {
-			FixaRepository.shared.updateValue(updatedTweak.key, to: updatedTweak.value)
+		for updatedFixable in fixables {
+			FixaRepository.shared.updateFixable(updatedFixable.key, to: updatedFixable.value)
 		}
 
 		return true

@@ -12,16 +12,16 @@ import Combine
 import Fixa
 
 // % Declare the set of fixable values
-extension FixableName {
-	static let size = "Envelope size"
-	static let angle = "Envelope angle"
-	static let open = "Letter read"
+struct AppFixables {
+	static let size = FixableSetup("Envelope size", config: .float(value: 50.0, min: 10.0, max: 150.0))
+	static let angle = FixableSetup("Envelope angle", config: .float(value: 0.0, min: -180.0, max: 180.0))
+	static let open = FixableSetup("Letter read", config: .bool(value: false))
 }
 
 class VisualEnvelope: ObservableObject {
-	@Published var size = FixableFloat(10.0, name: FixableName.size)		// % Wrap the variable instances by type and name
-	@Published var angle = FixableFloat(90.0, name: FixableName.angle)	// $ Can it be trusted to read the default value from the repo?
-	@Published var open = FixableBool(true, name: FixableName.open)
+	@Published var size = FixableFloat(AppFixables.size)		// % Wrap the variable instances by type and name
+	@Published var angle = FixableFloat(AppFixables.angle)
+	@Published var open = FixableBool(AppFixables.open)
 	var sizeSubject: AnyCancellable? = nil
 	var angleSubject: AnyCancellable? = nil
 	var openSubject: AnyCancellable? = nil
@@ -38,10 +38,9 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixableConfig.float(value:  0.0, min:  0.0, max: 360.0)),
-																								 (FixableName.size,  FixableConfig.float(value: 50.0, min: 10.0, max: 150.0)),
-																								 (FixableName.open,  FixableConfig.bool(value: false))])
-
+	var fixaStream = FixaStream(tweakDefinitions: [AppFixables.open, AppFixables.size, AppFixables.angle])
+		
+		
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
 		

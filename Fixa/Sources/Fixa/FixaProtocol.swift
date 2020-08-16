@@ -9,13 +9,29 @@
 import Foundation
 import Network
 
-public struct FixableName {
+public struct FixableSetup: Codable {
 	public typealias Label = String
+	public init(_ label: Label, config: FixableConfig) {
+		self.label = label
+		self.config = config
+	}
+	public let label: Label
+	let config: FixableConfig
 }
 
 // MARK: Errors
 enum FixaError: Error {
 	case serializationError(String)
+	case typeError(String)
+	
+	var errorDescription: String {
+		switch self {
+			case .serializationError(let explanation):
+				return explanation
+			case .typeError(let explanation):
+				return explanation
+		}
+	}
 }
 
 // MARK: Network packet serialisation
@@ -66,8 +82,6 @@ public enum FixableConfig: Codable {
 	}
 }
 
-typealias FixableConfigs = [FixableName.Label : FixableConfig]
-
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
 	enum MessageType: UInt32 {
@@ -77,11 +91,6 @@ class FixaProtocol: NWProtocolFramerImplementation {
 		case hangUp = 3
 	}
 	
-	struct TweakConfiguration: Codable {
-		let label: String
-		let setup: FixableConfig
-	}
-
 	static let bonjourType = "_fixa._tcp"
 	static let definition = NWProtocolFramer.Definition(implementation: FixaProtocol.self)
 	static var label = "Fixa Protocol"

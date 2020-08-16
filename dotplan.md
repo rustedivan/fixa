@@ -15,6 +15,7 @@
 
 ## Features
 - register tweakables with app icon
+- FixaStream should validate that all labels are unique
 - string tweaker
 - int tweaker
 - dropdown tweaker
@@ -29,3 +30,4 @@
 - send up app icon
 - event tweaker
 - bool tweaker
+- can the settings report say the name of its variable?

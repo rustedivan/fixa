@@ -15,7 +15,7 @@ class ControllerState: ObservableObject {
 	var controllerValueChanged = PassthroughSubject<[String], Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var tweakValues: FixableConfigs {
+	@Published var tweakValues: [FixableSetup.Label : FixableConfig] {
 		didSet { controllerValueChanged.send(dirtyKeys) }
 	}
 	var dirtyKeys: [String]
@@ -28,13 +28,14 @@ class ControllerState: ObservableObject {
 	}
 	
 	func tweakBoolBinding(for key: String) -> Binding<Bool> {
+		let bound = tweakValues[key]
 		return .init(
 			get: {
-				guard case let .bool(value) = self.tweakValues[key] else { return false }
+				guard case let .bool(value) = bound else { return false }
 				return value
 			},
 			set: {
-				guard case .bool = self.tweakValues[key] else { return }
+				guard case .bool = bound else { return }
 				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
 				self.tweakValues[key] = .bool(value: $0)
 			})
@@ -135,13 +136,13 @@ class FixaController {
 		})
 	}
 	
-	private func parseRegistration(registrationData: Data?) -> FixableConfigs? {
+	private func parseRegistration(registrationData: Data?) -> [FixableSetup.Label : FixableConfig]? {	// $ this needs a typename
 		guard let registrationData = registrationData else {
 			print("Fixa controller: received empty registration")
 			return nil
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode(FixableConfigs.self, from: registrationData) else {
+		guard let tweakables = try? PropertyListDecoder().decode([FixableSetup.Label : FixableConfig].self, from: registrationData) else {
 			print("Fixa controller: registration could not be parsed. Disconnecting.")
 			return nil
 		}
@@ -149,7 +150,7 @@ class FixaController {
 		return tweakables
 	}
 	
-	private func sendTweakableUpdates(dirtyTweakables: FixableConfigs) {
+	private func sendTweakableUpdates(dirtyTweakables: [FixableSetup.Label : FixableConfig]) {
 		let message = NWProtocolFramer.Message(fixaMessageType: .updateTweakables)
 		let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
 		
