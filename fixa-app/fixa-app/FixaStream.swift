@@ -20,13 +20,13 @@ class Fixable<T> {
 	
 	var newValues: PassthroughSubject<T, Never>
 	
-	init(_ value: T, name: FixableName) {
+	init(_ value: T, name: FixableName.Label) {
 		self.value = value
 		self.newValues = PassthroughSubject<T, Never>()
 		self.register(as: name)
 	}
 	
-	func register(as name: FixableName) {
+	func register(as name: FixableName.Label) {
 		FixaRepository.registerInstance(name, instance: self)
 	}
 }
@@ -51,21 +51,21 @@ fileprivate class FixaRepository {
 	private static var _shared: FixaRepository?
 	fileprivate static let shared = FixaRepository()
 	
-	fileprivate var bools: [FixableName : (config: FixaTweakable, label: String, instances: NSHashTable<FixableBool>)] = [:]
-	fileprivate var floats: [FixableName : (config: FixaTweakable, label: String, instances: NSHashTable<FixableFloat>)] = [:]
+	fileprivate var bools: [FixableName.Label : (config: FixaTweakable, label: String, instances: NSHashTable<FixableBool>)] = [:]
+	fileprivate var floats: [FixableName.Label : (config: FixaTweakable, label: String, instances: NSHashTable<FixableFloat>)] = [:]
 	
-	func addTweak(named name: FixableName, _ tweak: FixaTweakable) {
+	func addTweak(named name: FixableName.Label, _ tweak: FixaTweakable) {
 		switch tweak {
 			case .bool:
-				bools[name] = (tweak, name.rawValue, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
+				bools[name] = (tweak, name, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
-				floats[name] = (tweak, name.rawValue, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+				floats[name] = (tweak, name, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
 			case .none:
 				break
 		}
 	}
 	
-	static func registerInstance<T>(_ name: FixableName, instance: Fixable<T>) {
+	static func registerInstance<T>(_ name: FixableName.Label, instance: Fixable<T>) {
 		switch instance {
 			case let boolInstance as FixableBool:
 				FixaRepository.shared.bools[name]?.instances.add(boolInstance)
@@ -75,7 +75,7 @@ fileprivate class FixaRepository {
 		}
 	}
 	
-	func updateValue(_ name: FixableName, to value: FixaTweakable) {
+	func updateValue(_ name: FixableName.Label, to value: FixaTweakable) {
 		let repository = FixaRepository.shared
 		switch value {
 			case .bool(let value):
@@ -95,11 +95,11 @@ class FixaStream {
 	private var tweakConfigurations: FixaTweakables
 	private var tweakDictionary: FixaRepository
 	
-	init(tweakDefinitions: [(FixableName, FixaTweakable)]) {
+	init(tweakDefinitions: [(FixableName.Label, FixaTweakable)]) {
 		self.tweakConfigurations = [:]
 		self.tweakDictionary = FixaRepository.shared
 		for (name, definition) in tweakDefinitions {
-			self.tweakConfigurations[name.rawValue] = definition
+			self.tweakConfigurations[name] = definition
 			self.tweakDictionary.addTweak(named: name, definition)
 		}
 	}
@@ -222,8 +222,7 @@ class FixaStream {
 		}
 		
 		for updatedTweak in tweakables {
-			guard let tweakName = FixableName(rawValue: updatedTweak.key) else { continue }
-			FixaRepository.shared.updateValue(tweakName, to: updatedTweak.value)
+			FixaRepository.shared.updateValue(updatedTweak.key, to: updatedTweak.value)
 		}
 
 		return true

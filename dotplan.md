@@ -8,6 +8,7 @@
 - start listener on app resume
 √ figure out RAII-style registration with app dictionary
 √ publisher instead of setCallback
+√ FixableName cannot be an enum (can't cross package boundary)
 - inObservableObject
 - clean up into framework
 - merge down to public main

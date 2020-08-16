@@ -9,16 +9,16 @@
 import UIKit
 import Combine
 
-enum FixableName: String {
-	case size = "Envelope size"
-	case angle = "Envelope angle"
-	case open = "Letter read"
+extension FixableName {
+	static let size = "Envelope size"
+	static let angle = "Envelope angle"
+	static let open = "Letter read"
 }
 
 class VisualEnvelope: ObservableObject {
-	@Published var size = FixableFloat(10.0, name: .size)
-	@Published var angle = FixableFloat(90.0, name: .angle)
-	@Published var open = FixableBool(true, name: .open)
+	@Published var size = FixableFloat(10.0, name: FixableName.size)
+	@Published var angle = FixableFloat(90.0, name: FixableName.angle)
+	@Published var open = FixableBool(true, name: FixableName.open)
 	var sizeSubject: AnyCancellable? = nil
 	var angleSubject: AnyCancellable? = nil
 	var openSubject: AnyCancellable? = nil

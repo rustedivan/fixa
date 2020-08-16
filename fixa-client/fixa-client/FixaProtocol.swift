@@ -9,6 +9,10 @@
 import Foundation
 import Network
 
+struct FixableName {
+	typealias Label = String
+}
+
 // MARK: Errors
 enum FixaError: Error {
 	case serializationError(String)
@@ -63,7 +67,7 @@ enum FixaTweakable: Codable {
 	}
 }
 
-typealias FixaTweakables = [String : FixaTweakable]
+typealias FixaTweakables = [FixableName.Label : FixaTweakable]
 
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
