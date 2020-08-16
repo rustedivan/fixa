@@ -11,6 +11,9 @@
       location = "group:fixa-cnc/fixa-cnc.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:Fixa">
+   </FileRef>
+   <FileRef
       location = "group:fixa-client/fixa-client.xcodeproj">
    </FileRef>
    <FileRef

@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import Fixa
 
 extension FixableName {
 	static let size = "Envelope size"

@@ -3,22 +3,21 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1412DEB624D061A300099C5E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1412DEB524D061A300099C5E /* FixaProtocol.swift */; };
+		1482FDA224E907A500E9EA34 /* Fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 1482FDA124E907A500E9EA34 /* Fixa */; };
 		1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */; };
 		1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */; };
 		1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEC024CB0C9F00439A24 /* ContentView.swift */; };
 		1489FEC324CB0C9F00439A24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC224CB0C9F00439A24 /* Assets.xcassets */; };
 		1489FEC624CB0C9F00439A24 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */; };
 		1489FEC924CB0C9F00439A24 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC724CB0C9F00439A24 /* LaunchScreen.storyboard */; };
-		1489FED124CB0D4400439A24 /* FixaStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FED024CB0D4400439A24 /* FixaStream.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1412DEB524D061A300099C5E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = "../../fixa-client/fixa-client/FixaProtocol.swift"; sourceTree = "<group>"; };
+		1482FDA324E907BF00E9EA34 /* Fixa */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixa; path = ../Fixa; sourceTree = "<group>"; };
 		1489FEB924CB0C9F00439A24 /* fixa-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -27,7 +26,6 @@
 		1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1489FEC824CB0C9F00439A24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1489FECA24CB0C9F00439A24 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1489FED024CB0D4400439A24 /* FixaStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaStream.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,17 +33,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1482FDA224E907A500E9EA34 /* Fixa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1482FDA024E907A500E9EA34 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1489FEB024CB0C9F00439A24 = {
 			isa = PBXGroup;
 			children = (
 				1489FEBB24CB0C9F00439A24 /* fixa-app */,
+				1482FDA324E907BF00E9EA34 /* Fixa */,
 				1489FEBA24CB0C9F00439A24 /* Products */,
+				1482FDA024E907A500E9EA34 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,8 +69,6 @@
 			isa = PBXGroup;
 			children = (
 				1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */,
-				1489FED024CB0D4400439A24 /* FixaStream.swift */,
-				1412DEB524D061A300099C5E /* FixaProtocol.swift */,
 				1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */,
 				1489FEC024CB0C9F00439A24 /* ContentView.swift */,
 				1489FEC224CB0C9F00439A24 /* Assets.xcassets */,
@@ -97,6 +103,9 @@
 			dependencies = (
 			);
 			name = "fixa-app";
+			packageProductDependencies = (
+				1482FDA124E907A500E9EA34 /* Fixa */,
+			);
 			productName = "fixa-app";
 			productReference = 1489FEB924CB0C9F00439A24 /* fixa-app.app */;
 			productType = "com.apple.product-type.application";
@@ -154,8 +163,6 @@
 			files = (
 				1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */,
 				1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */,
-				1412DEB624D061A300099C5E /* FixaProtocol.swift in Sources */,
-				1489FED124CB0D4400439A24 /* FixaStream.swift in Sources */,
 				1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -352,6 +359,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1482FDA124E907A500E9EA34 /* Fixa */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Fixa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1489FEB124CB0C9F00439A24 /* Project object */;
 }

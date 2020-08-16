@@ -9,7 +9,9 @@
 import Foundation
 import Combine
 import Network
-import UIKit.UIDevice
+#if canImport(UIKit)
+	import UIKit.UIDevice
+#endif
 
 // MARK: App values
 class Fixable<T> {
@@ -116,7 +118,11 @@ class FixaStream {
 			return
 		}
 		
-		let deviceName = UIDevice.current.name
+		#if canImport(UIKit)
+			let deviceName = UIDevice.current.name
+		#else
+			let deviceName = Host.current().name ?? "Unknown device"
+		#endif
 		let appName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
 		let txtRecord = NWTXTRecord([
 			"deviceName": deviceName,

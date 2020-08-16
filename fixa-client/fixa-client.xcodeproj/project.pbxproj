@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1412DEB424D05BE000099C5E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1412DEB324D05BE000099C5E /* FixaProtocol.swift */; };
 		14D2B16824CACCAC007DD082 /* fixa_client.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D2B15E24CACCAC007DD082 /* fixa_client.framework */; };
 		14D2B16D24CACCAC007DD082 /* fixa_clientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B16C24CACCAC007DD082 /* fixa_clientTests.swift */; };
 		14D2B16F24CACCAC007DD082 /* fixa_client.h in Headers */ = {isa = PBXBuildFile; fileRef = 14D2B16124CACCAC007DD082 /* fixa_client.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -24,7 +23,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1412DEB324D05BE000099C5E /* FixaProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaProtocol.swift; sourceTree = "<group>"; };
 		14D2B15E24CACCAC007DD082 /* fixa_client.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = fixa_client.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B16124CACCAC007DD082 /* fixa_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fixa_client.h; sourceTree = "<group>"; };
 		14D2B16224CACCAC007DD082 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -75,7 +73,6 @@
 			children = (
 				14D2B16124CACCAC007DD082 /* fixa_client.h */,
 				14D2B16224CACCAC007DD082 /* Info.plist */,
-				1412DEB324D05BE000099C5E /* FixaProtocol.swift */,
 			);
 			path = "fixa-client";
 			sourceTree = "<group>";
@@ -199,7 +196,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1412DEB424D05BE000099C5E /* FixaProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,7 +391,6 @@
 		14D2B17624CACCAC007DD082 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
@@ -414,7 +409,6 @@
 		14D2B17724CACCAC007DD082 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
