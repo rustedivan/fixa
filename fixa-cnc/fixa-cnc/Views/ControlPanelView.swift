@@ -42,7 +42,7 @@ struct ControlPanelView: View {
 		 .frame(minWidth: 320.0)
 	}
 
-	func insertTypedController(_ tweak: FixaTweakable, named name: String) -> AnyView {
+	func insertTypedController(_ tweak: FixableConfig, named name: String) -> AnyView {
 		let controller: AnyView
 		switch tweak {
 			case .bool:

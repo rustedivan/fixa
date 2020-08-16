@@ -38,9 +38,9 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixaTweakable.float(value:  0.0, min:  0.0, max: 360.0)),
-																								 (FixableName.size,  FixaTweakable.float(value: 50.0, min: 10.0, max: 150.0)),
-																								 (FixableName.open,  FixaTweakable.bool(value: false))])
+	var fixaStream = FixaStream(tweakDefinitions: [(FixableName.angle, FixableConfig.float(value:  0.0, min:  0.0, max: 360.0)),
+																								 (FixableName.size,  FixableConfig.float(value: 50.0, min: 10.0, max: 150.0)),
+																								 (FixableName.open,  FixableConfig.bool(value: false))])
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.

@@ -19,12 +19,11 @@ enum FixaError: Error {
 }
 
 // MARK: Network packet serialisation
-public enum FixaTweakable: Codable {	// $ FixableConfig?
+public enum FixableConfig: Codable {
 	enum CodingKeys: CodingKey {
 		case bool, boolValue
 		case float, floatValue, floatMin, floatMax
 	}
-	
 	case none
 	case bool(value: Bool)
 	case float(value: Float, min: Float, max: Float)
@@ -48,7 +47,7 @@ public enum FixaTweakable: Codable {	// $ FixableConfig?
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		guard let key = container.allKeys.first else {
-			throw FixaError.serializationError("FixaTweakable could not be decoded")
+			throw FixaError.serializationError("FixableConfig could not be decoded")
 		}
 		switch key {
 			case .float:
@@ -67,7 +66,7 @@ public enum FixaTweakable: Codable {	// $ FixableConfig?
 	}
 }
 
-typealias FixaTweakables = [FixableName.Label : FixaTweakable]
+typealias FixableConfigs = [FixableName.Label : FixableConfig]
 
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
@@ -80,7 +79,7 @@ class FixaProtocol: NWProtocolFramerImplementation {
 	
 	struct TweakConfiguration: Codable {
 		let label: String
-		let config: FixaTweakable
+		let setup: FixableConfig
 	}
 
 	static let bonjourType = "_fixa._tcp"

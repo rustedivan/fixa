@@ -53,10 +53,10 @@ fileprivate class FixaRepository {
 	private static var _shared: FixaRepository?
 	fileprivate static let shared = FixaRepository()
 	
-	fileprivate var bools: [FixableName.Label : (config: FixaTweakable, label: String, instances: NSHashTable<FixableBool>)] = [:]
-	fileprivate var floats: [FixableName.Label : (config: FixaTweakable, label: String, instances: NSHashTable<FixableFloat>)] = [:]
+	fileprivate var bools: [FixableName.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
+	fileprivate var floats: [FixableName.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
 	
-	func addTweak(named name: FixableName.Label, _ tweak: FixaTweakable) {
+	func addTweak(named name: FixableName.Label, _ tweak: FixableConfig) {
 		switch tweak {
 			case .bool:
 				bools[name] = (tweak, name, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
@@ -77,7 +77,7 @@ fileprivate class FixaRepository {
 		}
 	}
 	
-	func updateValue(_ name: FixableName.Label, to value: FixaTweakable) {
+	func updateValue(_ name: FixableName.Label, to value: FixableConfig) {
 		let repository = FixaRepository.shared
 		switch value {
 			case .bool(let value):
@@ -94,10 +94,10 @@ fileprivate class FixaRepository {
 public class FixaStream {
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
-	private var tweakConfigurations: FixaTweakables
+	private var tweakConfigurations: FixableConfigs
 	private var tweakDictionary: FixaRepository
 	
-	public init(tweakDefinitions: [(FixableName.Label, FixaTweakable)]) {
+	public init(tweakDefinitions: [(FixableName.Label, FixableConfig)]) {
 		self.tweakConfigurations = [:]
 		self.tweakDictionary = FixaRepository.shared
 		for (name, definition) in tweakDefinitions {
@@ -223,7 +223,7 @@ public class FixaStream {
 			return false
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: valueUpdateData) else {
+		guard let tweakables = try? PropertyListDecoder().decode(FixableConfigs.self, from: valueUpdateData) else {
 			print("Fixa stream: value update could not be parsed. Disconnecting.")
 			return false
 		}

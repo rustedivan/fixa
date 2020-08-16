@@ -11,8 +11,6 @@ import Combine
 import Network
 import SwiftUI
 
-import Fixa
-
 struct BrowserResult {
 	let deviceName: String
 	let appName: String

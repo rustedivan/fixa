@@ -13,10 +13,4 @@
    <FileRef
       location = "group:Fixa">
    </FileRef>
-   <FileRef
-      location = "group:fixa-client/fixa-client.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:fixa-playground.playground">
-   </FileRef>
 </Workspace>

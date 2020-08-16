@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,7 @@
 		1489FEC324CB0C9F00439A24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC224CB0C9F00439A24 /* Assets.xcassets */; };
 		1489FEC624CB0C9F00439A24 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */; };
 		1489FEC924CB0C9F00439A24 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1489FEC724CB0C9F00439A24 /* LaunchScreen.storyboard */; };
+		14BB4BE624E94BD100CA59DE /* Fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 14BB4BE524E94BD100CA59DE /* Fixa */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14BB4BE624E94BD100CA59DE /* Fixa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,9 +101,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				14BB4BE824E94BDD00CA59DE /* PBXTargetDependency */,
 			);
 			name = "fixa-app";
 			packageProductDependencies = (
+				14BB4BE524E94BD100CA59DE /* Fixa */,
 			);
 			productName = "fixa-app";
 			productReference = 1489FEB924CB0C9F00439A24 /* fixa-app.app */;
@@ -165,6 +169,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		14BB4BE824E94BDD00CA59DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 14BB4BE724E94BDD00CA59DE /* Fixa */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		1489FEC724CB0C9F00439A24 /* LaunchScreen.storyboard */ = {
@@ -356,6 +367,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		14BB4BE524E94BD100CA59DE /* Fixa */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Fixa;
+		};
+		14BB4BE724E94BDD00CA59DE /* Fixa */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Fixa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1489FEB124CB0C9F00439A24 /* Project object */;
 }

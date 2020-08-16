@@ -15,7 +15,7 @@ class ControllerState: ObservableObject {
 	var controllerValueChanged = PassthroughSubject<[String], Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var tweakValues: FixaTweakables {
+	@Published var tweakValues: FixableConfigs {
 		didSet { controllerValueChanged.send(dirtyKeys) }
 	}
 	var dirtyKeys: [String]
@@ -135,13 +135,13 @@ class FixaController {
 		})
 	}
 	
-	private func parseRegistration(registrationData: Data?) -> FixaTweakables? {
+	private func parseRegistration(registrationData: Data?) -> FixableConfigs? {
 		guard let registrationData = registrationData else {
 			print("Fixa controller: received empty registration")
 			return nil
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode(FixaTweakables.self, from: registrationData) else {
+		guard let tweakables = try? PropertyListDecoder().decode(FixableConfigs.self, from: registrationData) else {
 			print("Fixa controller: registration could not be parsed. Disconnecting.")
 			return nil
 		}
@@ -149,7 +149,7 @@ class FixaController {
 		return tweakables
 	}
 	
-	private func sendTweakableUpdates(dirtyTweakables: FixaTweakables) {
+	private func sendTweakableUpdates(dirtyTweakables: FixableConfigs) {
 		let message = NWProtocolFramer.Message(fixaMessageType: .updateTweakables)
 		let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
 		
