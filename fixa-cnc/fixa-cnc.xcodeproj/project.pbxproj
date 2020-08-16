@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1409032224CCBA13000440FD /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1409032124CCBA13000440FD /* BrowserView.swift */; };
 		140DB33A24E5A16800BD815D /* FixaCnCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140DB33924E5A16800BD815D /* FixaCnCApp.swift */; };
+		14B3D37624E90E9100ACA53E /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B3D37524E90E9100ACA53E /* FixaProtocol.swift */; };
 		14D2B13424CACC2D007DD082 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13324CACC2D007DD082 /* AppDelegate.swift */; };
 		14D2B13624CACC2D007DD082 /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B13524CACC2D007DD082 /* ControlPanelView.swift */; };
 		14D2B13824CACC2E007DD082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D2B13724CACC2E007DD082 /* Assets.xcassets */; };
@@ -17,7 +18,6 @@
 		14D2B14A24CACC2E007DD082 /* fixa_cncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B14924CACC2E007DD082 /* fixa_cncTests.swift */; };
 		14D2B17924CB028B007DD082 /* FixaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D2B17824CB028B007DD082 /* FixaController.swift */; };
 		14E366F924DBFA2E007871B1 /* FixaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E366F824DBFA2E007871B1 /* FixaBrowser.swift */; };
-		14F05A7E24E90A700066B391 /* FixaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F05A7D24E90A700066B391 /* FixaProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +33,7 @@
 /* Begin PBXFileReference section */
 		1409032124CCBA13000440FD /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
 		140DB33924E5A16800BD815D /* FixaCnCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaCnCApp.swift; sourceTree = "<group>"; };
+		14B3D37524E90E9100ACA53E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = ../../Fixa/Sources/Fixa/FixaProtocol.swift; sourceTree = "<group>"; };
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14D2B13524CACC2D007DD082 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
@@ -46,7 +47,6 @@
 		14D2B14B24CACC2E007DD082 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14D2B17824CB028B007DD082 /* FixaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaController.swift; sourceTree = "<group>"; };
 		14E366F824DBFA2E007871B1 /* FixaBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaBrowser.swift; sourceTree = "<group>"; };
-		14F05A7D24E90A700066B391 /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = ../../Fixa/Sources/Fixa/FixaProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,12 +76,20 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		14B3D37224E90E5800ACA53E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		14D2B12724CACC2D007DD082 = {
 			isa = PBXGroup;
 			children = (
 				14D2B13224CACC2D007DD082 /* fixa-cnc */,
 				14D2B14824CACC2E007DD082 /* fixa-cncTests */,
 				14D2B13124CACC2D007DD082 /* Products */,
+				14B3D37224E90E5800ACA53E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -101,7 +109,7 @@
 				14D2B13324CACC2D007DD082 /* AppDelegate.swift */,
 				14E366F824DBFA2E007871B1 /* FixaBrowser.swift */,
 				14D2B17824CB028B007DD082 /* FixaController.swift */,
-				14F05A7D24E90A700066B391 /* FixaProtocol.swift */,
+				14B3D37524E90E9100ACA53E /* FixaProtocol.swift */,
 				1409032324CCBB19000440FD /* Views */,
 				14D2B13724CACC2E007DD082 /* Assets.xcassets */,
 				14D2B13C24CACC2E007DD082 /* Main.storyboard */,
@@ -145,6 +153,8 @@
 			dependencies = (
 			);
 			name = "fixa-cnc";
+			packageProductDependencies = (
+			);
 			productName = "fixa-cnc";
 			productReference = 14D2B13024CACC2D007DD082 /* fixa-cnc.app */;
 			productType = "com.apple.product-type.application";
@@ -236,7 +246,7 @@
 				140DB33A24E5A16800BD815D /* FixaCnCApp.swift in Sources */,
 				14E366F924DBFA2E007871B1 /* FixaBrowser.swift in Sources */,
 				1409032224CCBA13000440FD /* BrowserView.swift in Sources */,
-				14F05A7E24E90A700066B391 /* FixaProtocol.swift in Sources */,
+				14B3D37624E90E9100ACA53E /* FixaProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

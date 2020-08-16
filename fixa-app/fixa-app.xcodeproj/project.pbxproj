@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1482FDA224E907A500E9EA34 /* Fixa in Frameworks */ = {isa = PBXBuildFile; productRef = 1482FDA124E907A500E9EA34 /* Fixa */; };
 		1489FEBD24CB0C9F00439A24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */; };
 		1489FEBF24CB0C9F00439A24 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */; };
 		1489FEC124CB0C9F00439A24 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489FEC024CB0C9F00439A24 /* ContentView.swift */; };
@@ -17,7 +16,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1482FDA324E907BF00E9EA34 /* Fixa */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixa; path = ../Fixa; sourceTree = "<group>"; };
 		1489FEB924CB0C9F00439A24 /* fixa-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -26,6 +24,7 @@
 		1489FEC524CB0C9F00439A24 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1489FEC824CB0C9F00439A24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1489FECA24CB0C9F00439A24 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14B3D36E24E90CC100ACA53E /* Fixa */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixa; path = ../Fixa; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,7 +32,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1482FDA224E907A500E9EA34 /* Fixa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,7 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				1489FEBB24CB0C9F00439A24 /* fixa-app */,
-				1482FDA324E907BF00E9EA34 /* Fixa */,
+				14B3D36E24E90CC100ACA53E /* Fixa */,
 				1489FEBA24CB0C9F00439A24 /* Products */,
 				1482FDA024E907A500E9EA34 /* Frameworks */,
 			);
@@ -104,7 +102,6 @@
 			);
 			name = "fixa-app";
 			packageProductDependencies = (
-				1482FDA124E907A500E9EA34 /* Fixa */,
 			);
 			productName = "fixa-app";
 			productReference = 1489FEB924CB0C9F00439A24 /* fixa-app.app */;
@@ -359,13 +356,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		1482FDA124E907A500E9EA34 /* Fixa */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Fixa;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1489FEB124CB0C9F00439A24 /* Project object */;
 }

@@ -14,15 +14,15 @@ import Network
 #endif
 
 // MARK: App values
-class Fixable<T> {
+public class Fixable<T> {
 	var value: T { didSet {
 			newValues.send(value)
 		}
 	}
 	
-	var newValues: PassthroughSubject<T, Never>
+	public var newValues: PassthroughSubject<T, Never>
 	
-	init(_ value: T, name: FixableName.Label) {
+	public init(_ value: T, name: FixableName.Label) {
 		self.value = value
 		self.newValues = PassthroughSubject<T, Never>()
 		self.register(as: name)
@@ -34,17 +34,17 @@ class Fixable<T> {
 }
 
 // Bool tweakable
-typealias FixableBool = Fixable<Bool>
+public typealias FixableBool = Fixable<Bool>
 extension Bool {
-	init(_ tweakable: FixableBool) {
+	public init(_ tweakable: FixableBool) {
 		self = tweakable.value
 	}
 }
 
 // Float tweakable
-typealias FixableFloat = Fixable<Float>
+public typealias FixableFloat = Fixable<Float>
 extension Float {
-	init(_ tweakable: FixableFloat) {
+	public init(_ tweakable: FixableFloat) {
 		self = tweakable.value
 	}
 }
@@ -91,13 +91,13 @@ fileprivate class FixaRepository {
 	}
 }
 
-class FixaStream {
+public class FixaStream {
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
 	private var tweakConfigurations: FixaTweakables
 	private var tweakDictionary: FixaRepository
 	
-	init(tweakDefinitions: [(FixableName.Label, FixaTweakable)]) {
+	public init(tweakDefinitions: [(FixableName.Label, FixaTweakable)]) {
 		self.tweakConfigurations = [:]
 		self.tweakDictionary = FixaRepository.shared
 		for (name, definition) in tweakDefinitions {
@@ -106,7 +106,7 @@ class FixaStream {
 		}
 	}
 
-	func startListening() {
+	public func startListening() {
 		let parameters = NWParameters.tcp
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
@@ -167,6 +167,7 @@ class FixaStream {
 		listener.start(queue: .main)
 	}
 	
+	// $ Can this stay internal?
 	func sendTweakableRegistration() {
 		let message = NWProtocolFramer.Message(fixaMessageType: .registerTweakables)
 		let context = NWConnection.ContentContext(identifier: "FixaRegistration", metadata: [message])

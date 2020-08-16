@@ -9,8 +9,8 @@
 import Foundation
 import Network
 
-struct FixableName {
-	typealias Label = String
+public struct FixableName {
+	public typealias Label = String
 }
 
 // MARK: Errors
@@ -19,7 +19,7 @@ enum FixaError: Error {
 }
 
 // MARK: Network packet serialisation
-enum FixaTweakable: Codable {
+public enum FixaTweakable: Codable {	// $ FixableConfig?
 	enum CodingKeys: CodingKey {
 		case bool, boolValue
 		case float, floatValue, floatMin, floatMax
@@ -29,7 +29,7 @@ enum FixaTweakable: Codable {
 	case bool(value: Bool)
 	case float(value: Float, min: Float, max: Float)
 	
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 			case .bool(let value):
@@ -45,7 +45,7 @@ enum FixaTweakable: Codable {
 		}
 	}
 	
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		guard let key = container.allKeys.first else {
 			throw FixaError.serializationError("FixaTweakable could not be decoded")
