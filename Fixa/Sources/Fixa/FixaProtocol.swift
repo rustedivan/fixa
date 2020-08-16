@@ -77,17 +77,19 @@ public enum FixableConfig: Codable {
 				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
 				self = .bool(value: value)
 			default:
-				throw FixaError.serializationError("Unexpected \(key) in tweak packet")
+				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
 		}
 	}
 }
+
+typealias NamedFixables = [FixableSetup.Label : FixableConfig]
 
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
 	enum MessageType: UInt32 {
 		case invalid = 0
-		case registerTweakables = 1
-		case updateTweakables = 2
+		case registerFixables = 1
+		case updateFixables = 2
 		case hangUp = 3
 	}
 	

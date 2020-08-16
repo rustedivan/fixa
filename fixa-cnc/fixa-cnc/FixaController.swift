@@ -15,7 +15,7 @@ class ControllerState: ObservableObject {
 	var controllerValueChanged = PassthroughSubject<[String], Never>()
 	@Published var connecting: Bool
 	@Published var connected: Bool
-	@Published var tweakValues: [FixableSetup.Label : FixableConfig] {
+	@Published var fixableValues: NamedFixables {
 		didSet { controllerValueChanged.send(dirtyKeys) }
 	}
 	var dirtyKeys: [String]
@@ -23,12 +23,12 @@ class ControllerState: ObservableObject {
 	init() {
 		connecting = false
 		connected = false
-		tweakValues = [:]
+		fixableValues = [:]
 		dirtyKeys = []
 	}
 	
-	func tweakBoolBinding(for key: String) -> Binding<Bool> {
-		let bound = tweakValues[key]
+	func fixableBoolBinding(for key: String) -> Binding<Bool> {
+		let bound = fixableValues[key]
 		return .init(
 			get: {
 				guard case let .bool(value) = bound else { return false }
@@ -37,20 +37,20 @@ class ControllerState: ObservableObject {
 			set: {
 				guard case .bool = bound else { return }
 				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
-				self.tweakValues[key] = .bool(value: $0)
+				self.fixableValues[key] = .bool(value: $0)
 			})
 	}
 	
-	func tweakFloatBinding(for key: String) -> Binding<Float> {
+	func fixableFloatBinding(for key: String) -> Binding<Float> {
 		return .init(
 			get: {
-				guard case let .float(value, _, _) = self.tweakValues[key] else { return 0.0 }
+				guard case let .float(value, _, _) = self.fixableValues[key] else { return 0.0 }
 				return value
 			},
 			set: {
-				guard case .float(_, let min, let max) = self.tweakValues[key] else { return }
+				guard case .float(_, let min, let max) = self.fixableValues[key] else { return }
 				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
-				self.tweakValues[key] = .float(value: $0, min: min, max: max)
+				self.fixableValues[key] = .float(value: $0, min: min, max: max)
 			})
 	}
 }
@@ -74,10 +74,10 @@ class FixaController {
 		valueChangedStream = clientState.controllerValueChanged
 			.throttle(for: .seconds(frequency.rawValue), scheduler: DispatchQueue.main, latest: true)
 			.sink { dirtyKeys in
-				let dirtyTweakables = self.clientState.tweakValues.filter {
+				let dirtyFixables = self.clientState.fixableValues.filter {
 					dirtyKeys.contains($0.key)
 				}
-				self.sendTweakableUpdates(dirtyTweakables: dirtyTweakables)
+				self.sendFixableUpdates(dirtyFixables)
 				self.clientState.dirtyKeys = []
 			}
 	}
@@ -112,13 +112,13 @@ class FixaController {
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				self.clientState.connecting = false
 				switch message.fixaMessageType {
-					case .registerTweakables:
-						if let initialTweakables = self.parseRegistration(registrationData: data) {
-							self.clientState.tweakValues = initialTweakables
+					case .registerFixables:
+						if let initialFixables = self.parseRegistration(registrationData: data) {
+							self.clientState.fixableValues = initialFixables
 							self.clientState.connected = true
-							print("Fixa controller: received registration from app: \(initialTweakables.count) tweakables registered: \(initialTweakables.keys)")
+							print("Fixa controller: received registration from app: \(initialFixables.count) fixables registered: \(initialFixables.keys)")
 							print("Fixa controller: synching back to app")
-							self.sendTweakableUpdates(dirtyTweakables: self.clientState.tweakValues)
+							self.sendFixableUpdates(self.clientState.fixableValues)
 						} else {
 							self.clientConnection?.cancel()
 						}
@@ -126,7 +126,7 @@ class FixaController {
 						print("Fixa controller: app hung up.")
 						self.clientConnection?.cancel()
 						self.clientState.connected = false
-					case .updateTweakables: fallthrough
+					case .updateFixables: fallthrough
 					case .invalid:
 						print("Fixa controller: received unknown message type (\(message.fixaMessageType)). Ignoring.")
 				}
@@ -136,29 +136,29 @@ class FixaController {
 		})
 	}
 	
-	private func parseRegistration(registrationData: Data?) -> [FixableSetup.Label : FixableConfig]? {	// $ this needs a typename
+	private func parseRegistration(registrationData: Data?) -> NamedFixables? {
 		guard let registrationData = registrationData else {
 			print("Fixa controller: received empty registration")
 			return nil
 		}
 		
-		guard let tweakables = try? PropertyListDecoder().decode([FixableSetup.Label : FixableConfig].self, from: registrationData) else {
+		guard let fixables = try? PropertyListDecoder().decode(NamedFixables.self, from: registrationData) else {
 			print("Fixa controller: registration could not be parsed. Disconnecting.")
 			return nil
 		}
 
-		return tweakables
+		return fixables
 	}
 	
-	private func sendTweakableUpdates(dirtyTweakables: [FixableSetup.Label : FixableConfig]) {
-		let message = NWProtocolFramer.Message(fixaMessageType: .updateTweakables)
+	private func sendFixableUpdates(_ dirtyFixables: NamedFixables) {
+		let message = NWProtocolFramer.Message(fixaMessageType: .updateFixables)
 		let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
 		
 		let setupData: Data
 		do {
-			setupData = try PropertyListEncoder().encode(dirtyTweakables)
+			setupData = try PropertyListEncoder().encode(dirtyFixables)
 		} catch let error {
-			print("Could not serialize tweakable updates: \(error)")
+			print("Could not serialize fixables updates: \(error)")
 			return
 		}
 		

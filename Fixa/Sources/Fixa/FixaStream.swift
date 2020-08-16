@@ -49,19 +49,19 @@ public class Fixable<T> {
 	}
 }
 
-// Bool tweakable
+// Bool fixable
 public typealias FixableBool = Fixable<Bool>
 extension Bool {
-	public init(_ tweakable: FixableBool) {
-		self = tweakable.value
+	public init(_ fixable: FixableBool) {
+		self = fixable.value
 	}
 }
 
-// Float tweakable
+// Float fixable
 public typealias FixableFloat = Fixable<Float>
 extension Float {
-	public init(_ tweakable: FixableFloat) {
-		self = tweakable.value
+	public init(_ fixable: FixableFloat) {
+		self = fixable.value
 	}
 }
 
@@ -72,7 +72,7 @@ fileprivate class FixaRepository {
 	fileprivate var bools: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
 	fileprivate var floats: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
 	
-	func addTweak(_ setup: FixableSetup) {
+	func addFixable(_ setup: FixableSetup) {
 		switch setup.config {
 			case .bool:
 				bools[setup.label] = (setup.config, setup.label, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
@@ -110,17 +110,17 @@ fileprivate class FixaRepository {
 public class FixaStream {
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
-	private var tweakConfigurations: [FixableSetup.Label : FixableConfig]
-	private var tweakDictionary: FixaRepository
+	private var fixableConfigurations: NamedFixables
+	private var fixablesDictionary: FixaRepository
 	
-	public init(tweakDefinitions: [FixableSetup]) {	// $ rename
-		self.tweakConfigurations = [:]
-		self.tweakDictionary = FixaRepository.shared
+	public init(fixableSetups definitions: [FixableSetup]) {
+		self.fixableConfigurations = [:]
+		self.fixablesDictionary = FixaRepository.shared
 		
 		// $ Add the fixables' indices here
-		for definition in tweakDefinitions {
-			self.tweakConfigurations[definition.label] = definition.config
-			self.tweakDictionary.addTweak(definition)
+		for definition in definitions {
+			self.fixableConfigurations[definition.label] = definition.config
+			self.fixablesDictionary.addFixable(definition)
 		}
 	}
 
@@ -166,9 +166,9 @@ public class FixaStream {
 			self.controllerConnection!.stateUpdateHandler = { newState in
 				switch newState {
 					case .ready:
-						print("Fixa stream: listening to \(self.controllerConnection?.endpoint.debugDescription ?? "no endpoint"). Registering tweakables...")
+						print("Fixa stream: listening to \(self.controllerConnection?.endpoint.debugDescription ?? "no endpoint"). Registering fixables...")
 						self.receiveMessage()
-						self.sendTweakableRegistration()
+						self.sendFixableRegistration()
 					case .failed(let error):
 						print("Fixa stream: Connection failed: \(error)")
 						self.controllerConnection!.cancel()
@@ -185,23 +185,22 @@ public class FixaStream {
 		listener.start(queue: .main)
 	}
 	
-	// $ Can this stay internal?
-	func sendTweakableRegistration() {
-		let message = NWProtocolFramer.Message(fixaMessageType: .registerTweakables)
+	func sendFixableRegistration() {
+		let message = NWProtocolFramer.Message(fixaMessageType: .registerFixables)
 		let context = NWConnection.ContentContext(identifier: "FixaRegistration", metadata: [message])
 		
 		let setupData: Data
 		do {
 			// $ Send in some kind of order
-			setupData = try PropertyListEncoder().encode(tweakConfigurations)
+			setupData = try PropertyListEncoder().encode(fixableConfigurations)
 		} catch let error {
-			print("Could not serialize tweakables dictionary: \(error)")
+			print("Could not serialize fixables dictionary: \(error)")
 			return
 		}
 		
 		self.controllerConnection!.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
 			if let error = error {
-				print("Could not register tweakables: \(error)")
+				print("Could not register fixables: \(error)")
 			}
 		})
 	}
@@ -217,7 +216,7 @@ public class FixaStream {
 				}
 			} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 				switch message.fixaMessageType {
-					case .updateTweakables:
+					case .updateFixables:
 						if !self.applyValueUpdate(valueUpdateData: data) {
 							self.controllerConnection?.cancel()
 						}
@@ -225,7 +224,7 @@ public class FixaStream {
 						print("Fixa stream: controller hung up.")
 						self.controllerConnection?.cancel()
 					// Not valid for stream side
-					case .registerTweakables: fallthrough
+					case .registerFixables: fallthrough
 					case .invalid:
 						print("Fixa stream: received unknown message type (\(message.fixaMessageType)). Ignoring.")
 				}
@@ -241,7 +240,7 @@ public class FixaStream {
 			return false
 		}
 		
-		guard let fixables = try? PropertyListDecoder().decode([FixableSetup.Label : FixableConfig].self, from: valueUpdateData) else {
+		guard let fixables = try? PropertyListDecoder().decode(NamedFixables.self, from: valueUpdateData) else {
 			print("Fixa stream: value update could not be parsed. Disconnecting.")
 			return false
 		}
