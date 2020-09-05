@@ -39,10 +39,12 @@ public enum FixableConfig: Codable {
 	enum CodingKeys: CodingKey {
 		case bool, boolValue
 		case float, floatValue, floatMin, floatMax
+		case divider
 	}
 	case none
 	case bool(value: Bool)
 	case float(value: Float, min: Float, max: Float)
+	case divider
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
@@ -55,6 +57,8 @@ public enum FixableConfig: Codable {
 				try floatContainer.encode(value, forKey: .floatValue)
 				try floatContainer.encode(min, forKey: .floatMin)
 				try floatContainer.encode(max, forKey: .floatMax)
+			case .divider:
+				_ = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
 			case .none:
 				break
 		}
@@ -76,6 +80,8 @@ public enum FixableConfig: Codable {
 				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
 				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
 				self = .bool(value: value)
+			case .divider:
+				self = .divider
 			default:
 				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
 		}

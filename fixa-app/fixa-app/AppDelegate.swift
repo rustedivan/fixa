@@ -38,7 +38,13 @@ class VisualEnvelope: ObservableObject {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
-	var fixaStream = FixaStream(fixableSetups: [AppFixables.open, AppFixables.size, AppFixables.angle])
+	var fixaStream = FixaStream(fixableSetups: [
+		FixableSetup("Tweaks", config: .divider),
+		AppFixables.size,
+		AppFixables.angle,
+		FixableSetup("Controls", config: .divider),
+		AppFixables.open
+	])
 		
 		
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

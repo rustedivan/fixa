@@ -90,6 +90,8 @@ struct ControlPanelView: View {
 			case .float(_, let min, let max):
 				let binding = self.clientState.fixableFloatBinding(for: name)
 				controller = AnyView(FixableSlider(value: binding, label: name, min: min, max: max))
+			case .divider:
+				controller = AnyView(Text(name).bold())
 			case .none:
 				controller = AnyView(Text(name))
 		}
@@ -118,12 +120,6 @@ struct FixableSlider: View {
 	let label: String
 	let min: Float
 	let max: Float
-	
-//	init(value: Binding<Float>, min: Float, max: Float) {
-//		_fixableValue = value
-//		self.min = min
-//		self.max = max
-//	}
 	
 	var body: some View {
 		let format = NumberFormatter()

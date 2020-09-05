@@ -78,6 +78,7 @@ fileprivate class FixaRepository {
 				bools[setup.label] = (setup.config, setup.label, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
 				floats[setup.label] = (setup.config, setup.label, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+			case .divider: fallthrough
 			case .none:
 				break
 		}
@@ -102,6 +103,7 @@ fileprivate class FixaRepository {
 			case .float(let value, _, _):
 				guard let instances = repository.floats[name]?.instances.allObjects else { return }
 				_ = instances.map { $0.value = value }
+			case .divider: fallthrough
 			case .none: break
 		}
 	}
