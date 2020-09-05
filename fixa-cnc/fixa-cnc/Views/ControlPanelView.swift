@@ -71,8 +71,10 @@ struct ControlPanelView: View {
 			if clientState.connecting {
 				ActivityIndicator()
 			} else if clientState.connected {
-				ForEach(Array(clientState.fixableValues.keys), id: \.self) { (key) in
-					self.insertTypedController(self.clientState.fixableValues[key] ?? .none, named: key)
+				// $ This is terrible until XC12
+				ForEach(Array(clientState.fixableValues)
+									.sorted(by: { (lhs, rhs) in lhs.value.order < rhs.value.order }), id: \.self.key) { (key, value) in
+					self.insertTypedController(self.clientState.fixableValues[key]!, named: key)
 						.padding(.bottom)
 				}
 			}
@@ -87,11 +89,11 @@ struct ControlPanelView: View {
 			case .bool:
 				let binding = self.clientState.fixableBoolBinding(for: name)
 				controller = AnyView(FixableToggle(value: binding, label: name))
-			case .float(_, let min, let max):
+			case .float(_, let min, let max, _):
 				let binding = self.clientState.fixableFloatBinding(for: name)
 				controller = AnyView(FixableSlider(value: binding, label: name, min: min, max: max))
 			case .divider:
-				controller = AnyView(Text(name).bold())
+				controller = AnyView(Text(name).font(.headline))
 			case .none:
 				controller = AnyView(Text(name))
 		}
@@ -149,9 +151,10 @@ struct ControlPanelView_Previews: PreviewProvider {
 			previewState.connected = true
 			previewState.connecting = false
 			previewState.fixableValues = [
-				"Slider 1" : .float(value: 0.5, min: 0.25, max: 1.0),
-				"Slider 2" : .float(value: 90.0, min: 0.0, max: 360.55),
-				"Toggle" : .bool(value: true)
+				"Header" : .divider(order: 0),
+				"Slider 1" : .float(value: 0.5, min: 0.25, max: 1.0, order: 3),
+				"Slider 2" : .float(value: 90.0, min: 0.0, max: 360.55, order: 2),
+				"Toggle" : .bool(value: true, order: 1)
 			]
 			return ControlPanelView(clientState: previewState)
 				.frame(width: 450.0, height: 600.0)

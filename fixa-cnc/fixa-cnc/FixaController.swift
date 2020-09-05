@@ -31,26 +31,26 @@ class ControllerState: ObservableObject {
 		let bound = fixableValues[key]
 		return .init(
 			get: {
-				guard case let .bool(value) = bound else { return false }
+				guard case let .bool(value, _) = bound else { return false }
 				return value
 			},
 			set: {
-				guard case .bool = bound else { return }
+				guard case let .bool(_, i) = bound else { return }
 				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
-				self.fixableValues[key] = .bool(value: $0)
+				self.fixableValues[key] = .bool(value: $0, order: i)
 			})
 	}
 	
 	func fixableFloatBinding(for key: String) -> Binding<Float> {
 		return .init(
 			get: {
-				guard case let .float(value, _, _) = self.fixableValues[key] else { return 0.0 }
+				guard case let .float(value, _, _, _) = self.fixableValues[key] else { return 0.0 }
 				return value
 			},
 			set: {
-				guard case .float(_, let min, let max) = self.fixableValues[key] else { return }
+				guard case .float(_, let min, let max, let order) = self.fixableValues[key] else { return }
 				self.dirtyKeys.append(key)	// Mark the key as dirty before updating the value, otherwise valueChangedStream won't see it
-				self.fixableValues[key] = .float(value: $0, min: min, max: max)
+				self.fixableValues[key] = .float(value: $0, min: min, max: max, order: order)
 			})
 	}
 }

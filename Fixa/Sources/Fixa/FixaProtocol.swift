@@ -37,28 +37,43 @@ enum FixaError: Error {
 // MARK: Network packet serialisation
 public enum FixableConfig: Codable {
 	enum CodingKeys: CodingKey {
+		case order
 		case bool, boolValue
 		case float, floatValue, floatMin, floatMax
 		case divider
 	}
 	case none
-	case bool(value: Bool)
-	case float(value: Float, min: Float, max: Float)
-	case divider
+	case bool(value: Bool, order: Int = Int.max)
+	case float(value: Float, min: Float, max: Float, order: Int = Int.max)
+	case divider(order: Int = Int.max)
+	
+	public var order: Int {
+		get {
+			switch self {
+				case .bool(_, let order): return order
+				case .float(_, _, _, let order): return order
+				case .divider(let order): return order
+				default: return Int.max
+			}
+		}
+	}
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
-			case .bool(let value):
+			case let .bool(value, order):
 				var boolContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
 				try boolContainer.encode(value, forKey: .boolValue)
-			case .float(let value, let min, let max):
+				try boolContainer.encode(order, forKey: .order)
+			case let .float(value, min, max, order):
 				var floatContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
 				try floatContainer.encode(value, forKey: .floatValue)
 				try floatContainer.encode(min, forKey: .floatMin)
 				try floatContainer.encode(max, forKey: .floatMax)
-			case .divider:
-				_ = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
+				try floatContainer.encode(order, forKey: .order)
+			case let .divider(order):
+				var dividerContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
+				try dividerContainer.encode(order, forKey: .order)
 			case .none:
 				break
 		}
@@ -70,18 +85,22 @@ public enum FixableConfig: Codable {
 			throw FixaError.serializationError("FixableConfig could not be decoded")
 		}
 		switch key {
+			case .bool:
+				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
+				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
+				let order = try boolContainer.decode(Int.self, forKey: .order)
+				self = .bool(value: value, order: order)
 			case .float:
 				let floatContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
 				let value = try floatContainer.decode(Float.self, forKey: .floatValue)
 				let min = try floatContainer.decode(Float.self, forKey: .floatMin)
 				let max = try floatContainer.decode(Float.self, forKey: .floatMax)
-				self = .float(value: value, min: min, max: max)
-			case .bool:
-				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
-				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
-				self = .bool(value: value)
+				let order = try floatContainer.decode(Int.self, forKey: .order)
+				self = .float(value: value, min: min, max: max, order: order)
 			case .divider:
-				self = .divider
+				let dividerContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
+				let order = try dividerContainer.decode(Int.self, forKey: .order)
+				self = .divider(order: order)
 			default:
 				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
 		}

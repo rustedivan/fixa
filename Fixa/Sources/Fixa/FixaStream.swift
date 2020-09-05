@@ -25,9 +25,9 @@ public class Fixable<T> {
 	public init(_ setup: FixableSetup) {
 		do {
 			switch setup.config {
-				case .bool(let value) where value is T:
+				case .bool(let value, _) where value is T:
 					self.value = value as! T
-				case .float(let value, _, _) where value is T:
+				case .float(let value, _, _, _) where value is T:
 					self.value = value as! T
 				case .none:
 					throw(FixaError.typeError("Fixable \(setup.label) was setup with FixableConfig.none"))
@@ -97,10 +97,10 @@ fileprivate class FixaRepository {
 	func updateFixable(_ name: FixableSetup.Label, to value: FixableConfig) {
 		let repository = FixaRepository.shared
 		switch value {
-			case .bool(let value):
+			case .bool(let value, _):
 				guard let instances = repository.bools[name]?.instances.allObjects else { return }
 				_ = instances.map { $0.value = value }
-			case .float(let value, _, _):
+			case .float(let value, _, _, _):
 				guard let instances = repository.floats[name]?.instances.allObjects else { return }
 				_ = instances.map { $0.value = value }
 			case .divider: fallthrough
@@ -119,9 +119,15 @@ public class FixaStream {
 		self.fixableConfigurations = [:]
 		self.fixablesDictionary = FixaRepository.shared
 		
-		// $ Add the fixables' indices here
-		for definition in definitions {
-			self.fixableConfigurations[definition.label] = definition.config
+		for (i, definition) in definitions.enumerated() {
+			var config = definition.config
+			switch definition.config {
+				case let .bool(v, _): config = .bool(value: v, order: i)
+				case let .float(v, min, max, _): config = .float(value: v, min: min, max: max, order: i)
+				case .divider(_): config = .divider(order: i)
+				case .none: continue
+			}
+			self.fixableConfigurations[definition.label] = config
 			self.fixablesDictionary.addFixable(definition)
 		}
 	}

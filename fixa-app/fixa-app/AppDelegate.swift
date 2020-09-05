@@ -39,10 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var envelope: VisualEnvelope?
 	
 	var fixaStream = FixaStream(fixableSetups: [
-		FixableSetup("Tweaks", config: .divider),
+		FixableSetup("Tweaks", config: .divider()),
 		AppFixables.size,
 		AppFixables.angle,
-		FixableSetup("Controls", config: .divider),
+		FixableSetup("Controls", config: .divider()),
 		AppFixables.open
 	])
 		
