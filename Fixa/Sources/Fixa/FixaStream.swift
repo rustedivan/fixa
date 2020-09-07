@@ -199,7 +199,6 @@ public class FixaStream {
 		
 		let setupData: Data
 		do {
-			// $ Send in some kind of order
 			setupData = try PropertyListEncoder().encode(fixableConfigurations)
 		} catch let error {
 			print("Could not serialize fixables dictionary: \(error)")
