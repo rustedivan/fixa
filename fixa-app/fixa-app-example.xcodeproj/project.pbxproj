@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1489FEB924CB0C9F00439A24 /* fixa-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1489FEB924CB0C9F00439A24 /* fixa-app-example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-app-example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489FEBE24CB0C9F00439A24 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		1489FEC024CB0C9F00439A24 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -50,7 +50,7 @@
 		1489FEB024CB0C9F00439A24 = {
 			isa = PBXGroup;
 			children = (
-				1489FEBB24CB0C9F00439A24 /* fixa-app */,
+				1489FEBB24CB0C9F00439A24 /* fixa-app-example */,
 				14B3D36E24E90CC100ACA53E /* Fixa */,
 				1489FEBA24CB0C9F00439A24 /* Products */,
 				1482FDA024E907A500E9EA34 /* Frameworks */,
@@ -60,12 +60,12 @@
 		1489FEBA24CB0C9F00439A24 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1489FEB924CB0C9F00439A24 /* fixa-app.app */,
+				1489FEB924CB0C9F00439A24 /* fixa-app-example.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1489FEBB24CB0C9F00439A24 /* fixa-app */ = {
+		1489FEBB24CB0C9F00439A24 /* fixa-app-example */ = {
 			isa = PBXGroup;
 			children = (
 				1489FEBC24CB0C9F00439A24 /* AppDelegate.swift */,
@@ -76,7 +76,7 @@
 				1489FECA24CB0C9F00439A24 /* Info.plist */,
 				1489FEC424CB0C9F00439A24 /* Preview Content */,
 			);
-			path = "fixa-app";
+			path = "fixa-app-example";
 			sourceTree = "<group>";
 		};
 		1489FEC424CB0C9F00439A24 /* Preview Content */ = {
@@ -90,9 +90,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1489FEB824CB0C9F00439A24 /* fixa-app */ = {
+		1489FEB824CB0C9F00439A24 /* fixa-app-example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1489FECD24CB0C9F00439A24 /* Build configuration list for PBXNativeTarget "fixa-app" */;
+			buildConfigurationList = 1489FECD24CB0C9F00439A24 /* Build configuration list for PBXNativeTarget "fixa-app-example" */;
 			buildPhases = (
 				1489FEB524CB0C9F00439A24 /* Sources */,
 				1489FEB624CB0C9F00439A24 /* Frameworks */,
@@ -103,12 +103,12 @@
 			dependencies = (
 				14BB4BE824E94BDD00CA59DE /* PBXTargetDependency */,
 			);
-			name = "fixa-app";
+			name = "fixa-app-example";
 			packageProductDependencies = (
 				14BB4BE524E94BD100CA59DE /* Fixa */,
 			);
 			productName = "fixa-app";
-			productReference = 1489FEB924CB0C9F00439A24 /* fixa-app.app */;
+			productReference = 1489FEB924CB0C9F00439A24 /* fixa-app-example.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +126,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1489FEB424CB0C9F00439A24 /* Build configuration list for PBXProject "fixa-app" */;
+			buildConfigurationList = 1489FEB424CB0C9F00439A24 /* Build configuration list for PBXProject "fixa-app-example" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -139,7 +139,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1489FEB824CB0C9F00439A24 /* fixa-app */,
+				1489FEB824CB0C9F00439A24 /* fixa-app-example */,
 			);
 		};
 /* End PBXProject section */
@@ -308,16 +308,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"fixa-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"fixa-app-example/Preview Content\"";
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "fixa-app/Info.plist";
+				INFOPLIST_FILE = "fixa-app-example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "se.rusted.fixa-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "se.rusted.fixa-app-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -329,16 +329,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"fixa-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"fixa-app-example/Preview Content\"";
 				DEVELOPMENT_TEAM = Y4JDRD37Q9;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "fixa-app/Info.plist";
+				INFOPLIST_FILE = "fixa-app-example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "se.rusted.fixa-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "se.rusted.fixa-app-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -348,7 +348,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1489FEB424CB0C9F00439A24 /* Build configuration list for PBXProject "fixa-app" */ = {
+		1489FEB424CB0C9F00439A24 /* Build configuration list for PBXProject "fixa-app-example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1489FECB24CB0C9F00439A24 /* Debug */,
@@ -357,7 +357,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1489FECD24CB0C9F00439A24 /* Build configuration list for PBXNativeTarget "fixa-app" */ = {
+		1489FECD24CB0C9F00439A24 /* Build configuration list for PBXNativeTarget "fixa-app-example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1489FECE24CB0C9F00439A24 /* Debug */,

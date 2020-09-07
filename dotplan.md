@@ -1,21 +1,6 @@
 #  Fixa dotplan
 
-## POC
-√ send tweakables dictionary from server app
-√ send tweak messages from control client
-√ rename to "controller" and "app"
-√ disconnect on window close
-- start listener on app resume ----- does the app stop listening on connect?
-√ figure out RAII-style registration with app dictionary
-√ publisher instead of setCallback
-√ FixableName cannot be an enum (can't cross package boundary)
-- inObservableObject
-√ clean up into framework
-- Float to Double?
-- rename fixa-app to fixa-example
-- merge down to public main
-
-## Features
+## Feature plan
 - register tweakables with app icon
 - FixaStream should validate that all labels are unique
 - string tweaker

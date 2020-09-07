@@ -5,7 +5,7 @@
       location = "group:dotplan.md">
    </FileRef>
    <FileRef
-      location = "group:fixa-app/fixa-app.xcodeproj">
+      location = "group:/Users/rusted/Development/fixa/fixa-app/fixa-app-example.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:fixa-cnc/fixa-cnc.xcodeproj">

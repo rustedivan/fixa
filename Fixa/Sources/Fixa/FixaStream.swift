@@ -1,6 +1,6 @@
 //
 //  FixaStream.swift
-//  fixa-app
+//  fixa-app-example
 //
 //  Created by Ivan Milles on 2020-07-24.
 //  Copyright © 2020 Ivan Milles. All rights reserved.
