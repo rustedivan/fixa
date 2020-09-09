@@ -2,15 +2,27 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../fixa-controller/Fixa">
+   </FileRef>
+   <FileRef
       location = "group:dotplan.md">
    </FileRef>
-   <FileRef
-      location = "group:/Users/rusted/Development/fixa/fixa-app/fixa-app-example.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:fixa-cnc/fixa-cnc.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Fixa">
-   </FileRef>
+   <Group
+      location = "group:apps"
+      name = "Apps">
+      <Group
+         location = "group:fixa-cnc"
+         name = "fixa-cnc">
+         <FileRef
+            location = "group:fixa-cnc.xcodeproj">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:fixa-app-example"
+         name = "fixa-app-example">
+         <FileRef
+            location = "group:fixa-app-example.xcodeproj">
+         </FileRef>
+      </Group>
+   </Group>
 </Workspace>

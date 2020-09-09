@@ -33,7 +33,7 @@
 /* Begin PBXFileReference section */
 		1409032124CCBA13000440FD /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
 		140DB33924E5A16800BD815D /* FixaCnCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixaCnCApp.swift; sourceTree = "<group>"; };
-		14B3D37524E90E9100ACA53E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = ../../Fixa/Sources/Fixa/FixaProtocol.swift; sourceTree = "<group>"; };
+		14B3D37524E90E9100ACA53E /* FixaProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FixaProtocol.swift; path = "../../../../fixa-controller/Fixa/Sources/Fixa/FixaProtocol.swift"; sourceTree = "<group>"; };
 		14D2B13024CACC2D007DD082 /* fixa-cnc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fixa-cnc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D2B13324CACC2D007DD082 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14D2B13524CACC2D007DD082 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
