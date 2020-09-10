@@ -1,12 +1,11 @@
 import XCTest
-@testable import Fixa
+@testable import fixa
 
-final class FixaTests: XCTestCase {
+final class fixaTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(Fixa().text, "Hello, World!")
     }
 
     static var allTests = [

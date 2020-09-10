@@ -1,7 +1,7 @@
 import XCTest
 
-import FixaTests
+import fixaTests
 
 var tests = [XCTestCaseEntry]()
-tests += FixaTests.allTests()
+tests += fixaTests.allTests()
 XCTMain(tests)
