@@ -110,6 +110,8 @@ fileprivate class FixaRepository {
 }
 
 public class FixaStream {
+	public static var DidUpdateValues = Notification.Name(rawValue: "FixaStream.NewValues")
+	
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
 	private var fixableConfigurations: NamedFixables
@@ -255,6 +257,9 @@ public class FixaStream {
 		for updatedFixable in fixables {
 			FixaRepository.shared.updateFixable(updatedFixable.key, to: updatedFixable.value)
 		}
+		
+		let fixableNames = fixables.map { $0.key }
+		NotificationCenter.default.post(name: FixaStream.DidUpdateValues, object: fixableNames)
 
 		return true
 	}
