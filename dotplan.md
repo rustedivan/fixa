@@ -1,5 +1,10 @@
 #  Fixa dotplan
 
+## Quality plan
+- break out the public part of the protocol to a file
+- break out FixableSetup
+- FixableConfig deserves a home with FixableSetup
+
 ## Feature plan
 - register tweakables with app icon
 - FixaStream should validate that all labels are unique
