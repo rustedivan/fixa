@@ -15,7 +15,7 @@ import Network
 
 // MARK: App values
 public class Fixable<T> {
-	var value: T { didSet {
+	public var value: T { didSet {
 			newValues.send(value)
 		}
 	}
