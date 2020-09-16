@@ -9,16 +9,6 @@
 import Foundation
 import Network
 
-public struct FixableSetup: Codable {
-	public typealias Label = String
-	public init(_ label: Label, config: FixableConfig) {
-		self.label = label
-		self.config = config
-	}
-	public let label: Label
-	let config: FixableConfig
-}
-
 // MARK: Errors
 enum FixaError: Error {
 	case serializationError(String)
@@ -33,78 +23,6 @@ enum FixaError: Error {
 		}
 	}
 }
-
-// MARK: Network packet serialisation
-public enum FixableConfig: Codable {
-	enum CodingKeys: CodingKey {
-		case order
-		case bool, boolValue
-		case float, floatValue, floatMin, floatMax
-		case divider
-	}
-	case bool(value: Bool, order: Int = Int.max)
-	case float(value: Float, min: Float, max: Float, order: Int = Int.max)
-	case divider(order: Int = Int.max)
-	
-	public var order: Int {
-		get {
-			switch self {
-				case .bool(_, let order): return order
-				case .float(_, _, _, let order): return order
-				case .divider(let order): return order
-				default: return Int.max
-			}
-		}
-	}
-	
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		switch self {
-			case let .bool(value, order):
-				var boolContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
-				try boolContainer.encode(value, forKey: .boolValue)
-				try boolContainer.encode(order, forKey: .order)
-			case let .float(value, min, max, order):
-				var floatContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
-				try floatContainer.encode(value, forKey: .floatValue)
-				try floatContainer.encode(min, forKey: .floatMin)
-				try floatContainer.encode(max, forKey: .floatMax)
-				try floatContainer.encode(order, forKey: .order)
-			case let .divider(order):
-				var dividerContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
-				try dividerContainer.encode(order, forKey: .order)
-		}
-	}
-	
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		guard let key = container.allKeys.first else {
-			throw FixaError.serializationError("FixableConfig could not be decoded")
-		}
-		switch key {
-			case .bool:
-				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
-				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
-				let order = try boolContainer.decode(Int.self, forKey: .order)
-				self = .bool(value: value, order: order)
-			case .float:
-				let floatContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
-				let value = try floatContainer.decode(Float.self, forKey: .floatValue)
-				let min = try floatContainer.decode(Float.self, forKey: .floatMin)
-				let max = try floatContainer.decode(Float.self, forKey: .floatMax)
-				let order = try floatContainer.decode(Int.self, forKey: .order)
-				self = .float(value: value, min: min, max: max, order: order)
-			case .divider:
-				let dividerContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
-				let order = try dividerContainer.decode(Int.self, forKey: .order)
-				self = .divider(order: order)
-			default:
-				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
-		}
-	}
-}
-
-public typealias NamedFixables = [FixableSetup.Label : FixableConfig]
 
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
@@ -163,96 +81,6 @@ class FixaProtocol: NWProtocolFramerImplementation {
 			print("Could not write Fixa message: \(error)")
 		}
 	}
-}
-
-public protocol FixaProtocolDelegate {
-	func sessionDidStart(withFixables: NamedFixables)
-	func sessionDidEnd()
-}
-fileprivate var sharedProtocolDelegate: FixaProtocolDelegate? = nil
-
-public func fixaInitProtocol(withDelegate delegate: FixaProtocolDelegate) {
-	sharedProtocolDelegate = delegate
-	let parameters = NWParameters.tcp
-	let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
-	parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
-}
-
-public func fixaMakeConnection(to endpoint: NWEndpoint) -> NWConnection {
-	let parameters = NWParameters.tcp
-	parameters.prohibitedInterfaceTypes = [.loopback, .wiredEthernet]
-	let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
-	parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
-	return NWConnection(to: endpoint, using: parameters)
-}
-
-public func fixaSendUpdates(_ fixables: NamedFixables, over connection: NWConnection) {
-	let message = NWProtocolFramer.Message(fixaMessageType: .updateFixables)
-	let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
-	
-	let setupData: Data
-	do {
-		setupData = try PropertyListEncoder().encode(fixables)
-	} catch let error {
-		print("Could not serialize fixables updates: \(error)")
-		return
-	}
-	
-	connection.send(content: setupData, contentContext: context, isComplete: true, completion: .contentProcessed { error in
-		if let error = error {
-			print("Could not update values: \(error)")
-		}
-	})
-}
-
-public func fixaReceiveMessage(data: Data?, context: NWConnection.ContentContext?, error: NWError?) {
-	if let error = error {
-		switch error {
-			case .posix(let errorCode) where errorCode.rawValue == ECANCELED:
-				print("Fixa controller: connection ended.")
-			default:
-				print("Fixa controller: failed to receive message: \(error)")
-		}
-	} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
-		switch message.fixaMessageType {
-			case .registerFixables:
-				if let initialFixables = parseRegistration(registrationData: data) {
-					print("Fixa controller: received registration from app: \(initialFixables.count) fixables registered: \(initialFixables.keys)")
-					sharedProtocolDelegate?.sessionDidStart(withFixables: initialFixables)
-				} else {
-					sharedProtocolDelegate?.sessionDidEnd()
-				}
-			case .hangUp:
-				print("Fixa controller: app hung up.")
-				sharedProtocolDelegate?.sessionDidEnd()
-			case .updateFixables: fallthrough
-			case .invalid:
-				print("Fixa controller: received unknown message type (\(message.fixaMessageType)). Ignoring.")
-		}
-	}
-}
-
-public func fixaEndConnection(_ connection: NWConnection) {
-	let message = NWProtocolFramer.Message(fixaMessageType: .hangUp)
-	let context = NWConnection.ContentContext(identifier: "FixaHangup", metadata: [message])
-	
-	connection.send(content: nil, contentContext: context, isComplete: true, completion: .contentProcessed { error in
-		connection.cancel()
-	})
-}
-
-func parseRegistration(registrationData: Data?) -> NamedFixables? {
-	guard let registrationData = registrationData else {
-		print("Fixa controller: received empty registration")
-		return nil
-	}
-	
-	guard let fixables = try? PropertyListDecoder().decode(NamedFixables.self, from: registrationData) else {
-		print("Fixa controller: registration could not be parsed. Disconnecting.")
-		return nil
-	}
-
-	return fixables
 }
 
 extension NWProtocolFramer.Message {

@@ -7,65 +7,13 @@
 //
 
 import Foundation
-import Combine
 import Network
 #if canImport(UIKit)
 	import UIKit.UIDevice
 #endif
 
-// MARK: App values
-public class Fixable<T> {
-	public var value: T { didSet {
-			newValues.send(value)
-		}
-	}
-	
-	public var newValues: PassthroughSubject<T, Never>
-	
-	public init(_ setup: FixableSetup) {
-		do {
-			switch setup.config {
-				case .bool(let value, _) where value is T:
-					self.value = value as! T
-				case .float(let value, _, _, _) where value is T:
-					self.value = value as! T
-				default:
-					throw(FixaError.typeError("Fixable \"\(setup.label)\" is of type \(T.self) but was setup with \(setup.config)"))
-			}
-		} catch let error as FixaError {
-			fatalError(error.errorDescription)
-		} catch {
-			fatalError(error.localizedDescription)
-		}
-		
-		self.newValues = PassthroughSubject<T, Never>()
-		self.register(as: setup.label)
-	}
-	
-	func register(as name: FixableSetup.Label) {
-		FixaRepository.registerInstance(name, instance: self)
-	}
-}
-
-// Bool fixable
-public typealias FixableBool = Fixable<Bool>
-extension Bool {
-	public init(_ fixable: FixableBool) {
-		self = fixable.value
-	}
-}
-
-// Float fixable
-public typealias FixableFloat = Fixable<Float>
-extension Float {
-	public init(_ fixable: FixableFloat) {
-		self = fixable.value
-	}
-}
-
-fileprivate class FixaRepository {
-	private static var _shared: FixaRepository?
-	fileprivate static let shared = FixaRepository()
+class FixaRepository {
+	static let shared = FixaRepository()
 	
 	fileprivate var bools: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
 	fileprivate var floats: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
@@ -80,12 +28,12 @@ fileprivate class FixaRepository {
 		}
 	}
 	
-	static func registerInstance<T>(_ name: FixableSetup.Label, instance: Fixable<T>) {
+	func registerInstance<T>(_ name: FixableSetup.Label, instance: Fixable<T>) {
 		switch instance {
 			case let boolInstance as FixableBool:
-				FixaRepository.shared.bools[name]?.instances.add(boolInstance)
+				bools[name]?.instances.add(boolInstance)
 			case let floatInstance as FixableFloat:
-				FixaRepository.shared.floats[name]?.instances.add(floatInstance)
+				floats[name]?.instances.add(floatInstance)
 			default: break
 		}
 	}

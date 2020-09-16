@@ -1,13 +1,9 @@
 #  Fixa dotplan
 
-## Quality plan
-- break out the public part of the protocol to a file
-- break out FixableSetup
-- FixableConfig deserves a home with FixableSetup
-
 ## Feature plan
+- send frequency dropdown in controller
+- don't key to labels, but to H(label + index) so labels don't have to be unique 
 - register tweakables with app icon
-- FixaStream should validate that all labels are unique
 - string tweaker
 - int tweaker
 - dropdown tweaker
