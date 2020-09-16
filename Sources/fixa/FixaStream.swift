@@ -29,8 +29,6 @@ public class Fixable<T> {
 					self.value = value as! T
 				case .float(let value, _, _, _) where value is T:
 					self.value = value as! T
-				case .none:
-					throw(FixaError.typeError("Fixable \(setup.label) was setup with FixableConfig.none"))
 				default:
 					throw(FixaError.typeError("Fixable \"\(setup.label)\" is of type \(T.self) but was setup with \(setup.config)"))
 			}
@@ -78,9 +76,7 @@ fileprivate class FixaRepository {
 				bools[setup.label] = (setup.config, setup.label, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
 				floats[setup.label] = (setup.config, setup.label, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
-			case .divider: fallthrough
-			case .none:
-				break
+			case .divider: break
 		}
 	}
 	
@@ -103,8 +99,7 @@ fileprivate class FixaRepository {
 			case .float(let value, _, _, _):
 				guard let instances = repository.floats[name]?.instances.allObjects else { return }
 				_ = instances.map { $0.value = value }
-			case .divider: fallthrough
-			case .none: break
+			case .divider: break
 		}
 	}
 }
@@ -127,7 +122,6 @@ public class FixaStream {
 				case let .bool(v, _): config = .bool(value: v, order: i)
 				case let .float(v, min, max, _): config = .float(value: v, min: min, max: max, order: i)
 				case .divider(_): config = .divider(order: i)
-				case .none: continue
 			}
 			self.fixableConfigurations[definition.label] = config
 			self.fixablesDictionary.addFixable(definition)

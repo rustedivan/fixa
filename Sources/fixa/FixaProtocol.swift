@@ -42,7 +42,6 @@ public enum FixableConfig: Codable {
 		case float, floatValue, floatMin, floatMax
 		case divider
 	}
-	case none
 	case bool(value: Bool, order: Int = Int.max)
 	case float(value: Float, min: Float, max: Float, order: Int = Int.max)
 	case divider(order: Int = Int.max)
@@ -74,8 +73,6 @@ public enum FixableConfig: Codable {
 			case let .divider(order):
 				var dividerContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
 				try dividerContainer.encode(order, forKey: .order)
-			case .none:
-				break
 		}
 	}
 	
