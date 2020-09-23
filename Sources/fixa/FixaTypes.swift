@@ -7,10 +7,16 @@
 
 import Foundation
 import Combine
+import CoreGraphics.CGColor
+
+struct FixaColor {
+	let r, g, b, a: Float
+}
 
 public enum FixableConfig {
 	case bool(value: Bool, order: Int = Int.max)
 	case float(value: Float, min: Float, max: Float, order: Int = Int.max)
+	case color(value: CGColor, order: Int = Int.max)
 	case divider(order: Int = Int.max)
 	
 	public var order: Int {
@@ -18,6 +24,7 @@ public enum FixableConfig {
 			switch self {
 				case .bool(_, let order): return order
 				case .float(_, _, _, let order): return order
+				case .color(_, let order): return order
 				case .divider(let order): return order
 			}
 		}
@@ -50,6 +57,8 @@ public class Fixable<T> {
 				case .bool(let value, _) where value is T:
 					self.value = value as! T
 				case .float(let value, _, _, _) where value is T:
+					self.value = value as! T
+				case .color(let value, _) where value is T:
 					self.value = value as! T
 				default:
 					throw(FixaError.typeError("Fixable \"\(setup.label)\" is of type \(T.self) but was setup with \(setup.config)"))
@@ -84,3 +93,6 @@ extension Float {
 		self = fixable.value
 	}
 }
+
+// Color fixable
+public typealias FixableColor = Fixable<CGColor>

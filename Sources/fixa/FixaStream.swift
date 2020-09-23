@@ -17,6 +17,7 @@ class FixaRepository {
 	
 	fileprivate var bools: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableBool>)] = [:]
 	fileprivate var floats: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableFloat>)] = [:]
+	fileprivate var colors: [FixableSetup.Label : (setup: FixableConfig, label: String, instances: NSHashTable<FixableColor>)] = [:]
 	
 	func addFixable(_ setup: FixableSetup) {
 		switch setup.config {
@@ -24,6 +25,8 @@ class FixaRepository {
 				bools[setup.label] = (setup.config, setup.label, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
 				floats[setup.label] = (setup.config, setup.label, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+			case .color:
+				colors[setup.label] = (setup.config, setup.label, NSHashTable<FixableColor>(options: [.weakMemory, .objectPointerPersonality]))
 			case .divider: break
 		}
 	}
@@ -34,6 +37,8 @@ class FixaRepository {
 				bools[name]?.instances.add(boolInstance)
 			case let floatInstance as FixableFloat:
 				floats[name]?.instances.add(floatInstance)
+			case let colorInstance as FixableColor:
+				colors[name]?.instances.add(colorInstance)
 			default: break
 		}
 	}
@@ -46,6 +51,9 @@ class FixaRepository {
 				_ = instances.map { $0.value = value }
 			case .float(let value, _, _, _):
 				guard let instances = repository.floats[name]?.instances.allObjects else { return }
+				_ = instances.map { $0.value = value }
+			case .color(let value, _):
+				guard let instances = repository.colors[name]?.instances.allObjects else { return }
 				_ = instances.map { $0.value = value }
 			case .divider: break
 		}
@@ -69,6 +77,7 @@ public class FixaStream {
 			switch definition.config {
 				case let .bool(v, _): config = .bool(value: v, order: i)
 				case let .float(v, min, max, _): config = .float(value: v, min: min, max: max, order: i)
+				case let .color(v, _): config = .color(value: v, order: i)
 				case .divider(_): config = .divider(order: i)
 			}
 			self.fixableConfigurations[definition.label] = config
