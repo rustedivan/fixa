@@ -9,23 +9,28 @@ import Foundation
 import Combine
 import CoreGraphics.CGColor
 
-struct FixaColor {
-	let r, g, b, a: Float
+public struct FixableDisplay: Codable {
+	public let label: String
+	public let order: Int
+	public init(_ label: String, order: Int = Int.max) {
+		self.label = label
+		self.order = order
+	}
 }
 
 public enum FixableConfig {
-	case bool(value: Bool, order: Int = Int.max)
-	case float(value: Float, min: Float, max: Float, order: Int = Int.max)
-	case color(value: CGColor, order: Int = Int.max)
-	case divider(order: Int = Int.max)
+	case bool(value: Bool, display: FixableDisplay)
+	case float(value: Float, min: Float, max: Float, display: FixableDisplay)
+	case color(value: CGColor, display: FixableDisplay)
+	case divider(display: FixableDisplay)
 	
 	public var order: Int {
 		get {
 			switch self {
-				case .bool(_, let order): return order
-				case .float(_, _, _, let order): return order
-				case .color(_, let order): return order
-				case .divider(let order): return order
+				case .bool(_, let display): return display.order
+				case .float(_, _, _, let display): return display.order
+				case .color(_, let display): return display.order
+				case .divider(let display): return display.order
 			}
 		}
 	}

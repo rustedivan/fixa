@@ -9,7 +9,7 @@ import CoreGraphics.CGColor
 
 extension FixableConfig: Codable {
 	enum CodingKeys: CodingKey {
-		case order
+		case display
 		case bool, boolValue
 		case float, floatValue, floatMin, floatMax
 		case color, colorRed, colorGreen, colorBlue, colorAlpha
@@ -20,17 +20,17 @@ extension FixableConfig: Codable {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 			// $ Possible to encode the enum directly?
-			case let .bool(value, order):
+			case let .bool(value, display):
 				var boolContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
 				try boolContainer.encode(value, forKey: .boolValue)
-				try boolContainer.encode(order, forKey: .order)
-			case let .float(value, min, max, order):
+				try boolContainer.encode(display, forKey: .display)
+			case let .float(value, min, max, display):
 				var floatContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
 				try floatContainer.encode(value, forKey: .floatValue)
 				try floatContainer.encode(min, forKey: .floatMin)
 				try floatContainer.encode(max, forKey: .floatMax)
-				try floatContainer.encode(order, forKey: .order)
-			case let .color(value, order):
+				try floatContainer.encode(display, forKey: .display)
+			case let .color(value, display):
 				let rgbColor = value.converted(to: CGColorSpace(name: CGColorSpace.sRGB)!, intent: .defaultIntent, options: nil)
 				let components = rgbColor!.components!
 				var colorContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .color)
@@ -38,10 +38,10 @@ extension FixableConfig: Codable {
 				try colorContainer.encode(components[1], forKey: .colorGreen)
 				try colorContainer.encode(components[2], forKey: .colorBlue)
 				try colorContainer.encode(components[3], forKey: .colorAlpha)
-				try colorContainer.encode(order, forKey: .order)
-			case let .divider(order):
+				try colorContainer.encode(display, forKey: .display)
+			case let .divider(display):
 				var dividerContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
-				try dividerContainer.encode(order, forKey: .order)
+				try dividerContainer.encode(display, forKey: .display)
 		}
 	}
 	
@@ -54,29 +54,29 @@ extension FixableConfig: Codable {
 			case .bool:
 				let boolContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
 				let value = try boolContainer.decode(Bool.self, forKey: .boolValue)
-				let order = try boolContainer.decode(Int.self, forKey: .order)
-				self = .bool(value: value, order: order)
+				let display = try boolContainer.decode(FixableDisplay.self, forKey: .display)
+				self = .bool(value: value, display: display)
 			case .float:
 				let floatContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .float)
 				let value = try floatContainer.decode(Float.self, forKey: .floatValue)
 				let min = try floatContainer.decode(Float.self, forKey: .floatMin)
 				let max = try floatContainer.decode(Float.self, forKey: .floatMax)
-				let order = try floatContainer.decode(Int.self, forKey: .order)
-				self = .float(value: value, min: min, max: max, order: order)
+				let display = try floatContainer.decode(FixableDisplay.self, forKey: .display)
+				self = .float(value: value, min: min, max: max, display: display)
 			case .color:
 				let colorContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .color)
 				let red = try colorContainer.decode(CGFloat.self, forKey: .colorRed)
 				let green = try colorContainer.decode(CGFloat.self, forKey: .colorGreen)
 				let blue = try colorContainer.decode(CGFloat.self, forKey: .colorBlue)
 				let alpha = try colorContainer.decode(CGFloat.self, forKey: .colorAlpha)
-				let order = try colorContainer.decode(Int.self, forKey: .order)
+				let display = try colorContainer.decode(FixableDisplay.self, forKey: .display)
 				let cgColor = CGColor(srgbRed: red, green: green, blue: blue, alpha: alpha)
-				self = .color(value: cgColor, order: order)
+				self = .color(value: cgColor, display: display)
 			case .divider:
 				let dividerContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
-				let order = try dividerContainer.decode(Int.self, forKey: .order)
-				self = .divider(order: order)
-			case .boolValue, .floatValue, .floatMin, .floatMax, .colorRed, .colorGreen, .colorBlue, .colorAlpha, .order:
+				let display = try dividerContainer.decode(FixableDisplay.self, forKey: .display)
+				self = .divider(display: display)
+			case .boolValue, .floatValue, .floatMin, .floatMax, .colorRed, .colorGreen, .colorBlue, .colorAlpha, .display:
 				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
 		}
 	}

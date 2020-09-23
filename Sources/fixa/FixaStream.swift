@@ -74,11 +74,12 @@ public class FixaStream {
 		
 		for (i, definition) in definitions.enumerated() {
 			var config = definition.config
+			let display = FixableDisplay(definition.label, order: i)
 			switch definition.config {
-				case let .bool(v, _): config = .bool(value: v, order: i)
-				case let .float(v, min, max, _): config = .float(value: v, min: min, max: max, order: i)
-				case let .color(v, _): config = .color(value: v, order: i)
-				case .divider(_): config = .divider(order: i)
+				case let .bool(v, _): config = .bool(value: v, display: display)
+				case let .float(v, min, max, _): config = .float(value: v, min: min, max: max, display: display)
+				case let .color(v, _): config = .color(value: v, display: display)
+				case .divider(_): config = .divider(display: display)
 			}
 			self.fixableConfigurations[definition.label] = config
 			self.fixablesDictionary.addFixable(definition)
