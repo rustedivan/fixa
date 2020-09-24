@@ -9,6 +9,8 @@ import Foundation
 import Combine
 import CoreGraphics.CGColor
 
+public typealias FixableId = UUID
+
 public struct FixableDisplay: Codable {
 	public let label: String
 	public let order: Int
@@ -36,17 +38,7 @@ public enum FixableConfig {
 	}
 }
 
-public struct FixableSetup: Codable {
-	public typealias Label = String
-	public init(_ label: Label, config: FixableConfig) {
-		self.label = label
-		self.config = config
-	}
-	public let label: Label
-	let config: FixableConfig
-}
-
-public typealias NamedFixables = [FixableSetup.Label : FixableConfig]
+public typealias NamedFixables = [FixableId : FixableConfig]
 
 public class Fixable<T> {
 	public var value: T { didSet {
@@ -56,30 +48,10 @@ public class Fixable<T> {
 	
 	public var newValues: PassthroughSubject<T, Never>
 	
-	public init(_ setup: FixableSetup) {
-		do {
-			switch setup.config {
-				case .bool(let value, _) where value is T:
-					self.value = value as! T
-				case .float(let value, _, _, _) where value is T:
-					self.value = value as! T
-				case .color(let value, _) where value is T:
-					self.value = value as! T
-				default:
-					throw(FixaError.typeError("Fixable \"\(setup.label)\" is of type \(T.self) but was setup with \(setup.config)"))
-			}
-		} catch let error as FixaError {
-			fatalError(error.errorDescription)
-		} catch {
-			fatalError(error.localizedDescription)
-		}
-		
+	public init(_ key: FixableId, initial: T) {
 		self.newValues = PassthroughSubject<T, Never>()
-		self.register(as: setup.label)
-	}
-	
-	func register(as name: FixableSetup.Label) {
-		FixaRepository.shared.registerInstance(name, instance: self)
+		self.value = initial
+		FixaRepository.shared.registerInstance(key, instance: self)
 	}
 }
 
