@@ -68,13 +68,13 @@ public class FixaStream {
 	private var fixableConfigurations: NamedFixables
 	private var fixablesDictionary: FixaRepository
 	
-	public init(fixableSetups definitions: [FixableId : FixableConfig]) {
+	public init(fixableSetups definitions: [(FixableId, FixableConfig)]) {
 		self.fixableConfigurations = [:]
 		self.fixablesDictionary = FixaRepository.shared
 		
 		for (i, fixable) in definitions.enumerated() {
-			let key = fixable.key
-			let config = fixable.value
+			let key = fixable.0
+			let config = fixable.1
 			var orderedConfig: FixableConfig
 			switch config {
 				case let .bool(v, d): orderedConfig = .bool(value: v, display: FixableDisplay(d.label, order: i))
