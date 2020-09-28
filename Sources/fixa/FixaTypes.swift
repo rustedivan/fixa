@@ -8,6 +8,9 @@
 import Foundation
 import Combine
 import CoreGraphics.CGColor
+#if canImport(UIKit)
+import UIKit.UIColor
+#endif
 
 public typealias FixableId = UUID
 
@@ -73,3 +76,17 @@ extension Float {
 
 // Color fixable
 public typealias FixableColor = Fixable<CGColor>
+extension FixableColor {
+	#if canImport(UIKit)
+	public var uiColorValue: UIColor {
+		return UIColor(cgColor: value)
+	}
+	#endif
+	public var components: (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
+		let c = UIColor(cgColor: value)
+		var r = CGFloat(0.0); var g = CGFloat(0.0); var b = CGFloat(0.0); var a = CGFloat(1.0)
+		c.getRed(&r, green: &g, blue: &b, alpha: &a)
+		return (r: r, g: g, b: b, a: a)
+	}
+}
+
