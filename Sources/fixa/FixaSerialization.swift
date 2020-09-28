@@ -19,7 +19,6 @@ extension FixableConfig: Codable {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
-			// $ Possible to encode the enum directly?
 			case let .bool(value, display):
 				var boolContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bool)
 				try boolContainer.encode(value, forKey: .boolValue)
