@@ -9,7 +9,7 @@ import Foundation
 import Network
 
 public protocol FixaProtocolDelegate {
-	func sessionDidStart(withFixables: NamedFixables)
+	func sessionDidStart(_ name: String, withFixables: NamedFixables)
 	func sessionDidEnd()
 }
 fileprivate var sharedProtocolDelegate: FixaProtocolDelegate? = nil
@@ -35,7 +35,8 @@ public func fixaSendUpdates(_ fixables: NamedFixables, over connection: NWConnec
 	
 	let setupData: Data
 	do {
-		setupData = try PropertyListEncoder().encode(fixables)
+		let update = FixaMessageUpdate(updates: fixables)
+		setupData = try PropertyListEncoder().encode(update)
 	} catch let error {
 		print("Could not serialize fixables updates: \(error)")
 		return
@@ -60,9 +61,10 @@ public func fixaReceiveMessage(data: Data?, context: NWConnection.ContentContext
 	} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 		switch message.fixaMessageType {
 			case .registerFixables:
-				if let initialFixables = parseRegistration(registrationData: data) {
-					print("Fixa controller: received registration from app: \(initialFixables.count) fixables registered: \(initialFixables.keys)")
-					sharedProtocolDelegate?.sessionDidStart(withFixables: initialFixables)
+				if let (streamName, initialFixables) = parseRegistration(registrationData: data) {
+					print("Fixa controller: received registration from \(streamName): \(initialFixables.count) fixables registered: \(initialFixables.keys)")
+					
+					sharedProtocolDelegate?.sessionDidStart(streamName, withFixables: initialFixables)
 				} else {
 					sharedProtocolDelegate?.sessionDidEnd()
 				}
@@ -85,16 +87,16 @@ public func fixaEndConnection(_ connection: NWConnection) {
 	})
 }
 
-func parseRegistration(registrationData: Data?) -> NamedFixables? {
+func parseRegistration(registrationData: Data?) -> (String, NamedFixables)? {
 	guard let registrationData = registrationData else {
 		print("Fixa controller: received empty registration")
 		return nil
 	}
 	
-	guard let fixables = try? PropertyListDecoder().decode(NamedFixables.self, from: registrationData) else {
+	guard let registration = try? PropertyListDecoder().decode(FixaMessageRegister.self, from: registrationData) else {
 		print("Fixa controller: registration could not be parsed. Disconnecting.")
 		return nil
 	}
 
-	return fixables
+	return (registration.streamName, registration.fixables)
 }

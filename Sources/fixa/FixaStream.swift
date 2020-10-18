@@ -63,12 +63,15 @@ class FixaRepository {
 public class FixaStream {
 	public static var DidUpdateValues = Notification.Name(rawValue: "FixaStream.NewValues")
 	
+	private var streamName: String
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
 	private var fixableConfigurations: NamedFixables
 	private var fixablesDictionary: FixaRepository
 	
 	public init(fixableSetups definitions: [(FixableId, FixableConfig)]) {
+		streamName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
+		
 		self.fixableConfigurations = [:]
 		self.fixablesDictionary = FixaRepository.shared
 		
@@ -104,12 +107,11 @@ public class FixaStream {
 		#else
 			let deviceName = Host.current().name ?? "Unknown device"
 		#endif
-		let appName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
 		let txtRecord = NWTXTRecord([
 			"deviceName": deviceName,
-			"appName": appName
+			"appName": streamName
 		])
-		listener.service = NWListener.Service(name: "\(appName) - \(deviceName)", type: FixaProtocol.bonjourType, domain: nil, txtRecord: txtRecord)
+		listener.service = NWListener.Service(name: "\(streamName) - \(deviceName)", type: FixaProtocol.bonjourType, domain: nil, txtRecord: txtRecord)
 		
 		listener.stateUpdateHandler = { newState in
 			switch newState {
@@ -154,7 +156,8 @@ public class FixaStream {
 		
 		let setupData: Data
 		do {
-			setupData = try PropertyListEncoder().encode(fixableConfigurations)
+			let registration = FixaMessageRegister(streamName: streamName, fixables: fixableConfigurations)
+			setupData = try PropertyListEncoder().encode(registration)
 		} catch let error {
 			print("Could not serialize fixables dictionary: \(error)")
 			return
@@ -202,16 +205,16 @@ public class FixaStream {
 			return false
 		}
 		
-		guard let fixables = try? PropertyListDecoder().decode(NamedFixables.self, from: valueUpdateData) else {
+		guard let update = try? PropertyListDecoder().decode(FixaMessageUpdate.self, from: valueUpdateData) else {
 			print("Fixa stream: value update could not be parsed. Disconnecting.")
 			return false
 		}
 		
-		for updatedFixable in fixables {
+		for updatedFixable in update.updates {
 			FixaRepository.shared.updateFixable(updatedFixable.key, to: updatedFixable.value)
 		}
 		
-		let fixableNames = fixables.map { $0.key }
+		let fixableNames = update.updates.map { $0.key }
 		NotificationCenter.default.post(name: FixaStream.DidUpdateValues, object: fixableNames)
 
 		return true

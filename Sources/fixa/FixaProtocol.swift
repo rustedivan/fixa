@@ -130,3 +130,13 @@ struct FixaProtocolHeader: Codable {
 		return MemoryLayout<UInt32>.size * 2
 	}
 }
+
+// MARK: Messages
+struct FixaMessageRegister: Codable {
+	let streamName: String
+	let fixables: NamedFixables
+}
+
+struct FixaMessageUpdate: Codable {
+	let updates: NamedFixables
+}
