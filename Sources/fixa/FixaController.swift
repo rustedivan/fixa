@@ -53,6 +53,7 @@ public func fixaReceiveMessage(data: Data?, context: NWConnection.ContentContext
 		switch error {
 			case .posix(let errorCode) where errorCode.rawValue == ECANCELED:
 				print("Fixa controller: connection ended.")
+				sharedProtocolDelegate?.sessionDidEnd()
 			default:
 				print("Fixa controller: failed to receive message: \(error)")
 		}
