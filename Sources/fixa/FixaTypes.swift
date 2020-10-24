@@ -12,14 +12,7 @@ import CoreGraphics.CGColor
 import UIKit.UIColor
 #endif
 
-public struct FixableId: Codable, Hashable {
-	let group: String
-	let name: String
-	public init(_ name: String, in group: String = "root") {
-		self.name = name
-		self.group = group
-	}
-}
+public typealias FixableId = String
 
 public struct FixableDisplay: Codable {
 	public let label: String
