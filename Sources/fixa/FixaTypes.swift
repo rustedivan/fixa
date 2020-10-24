@@ -12,7 +12,12 @@ import CoreGraphics.CGColor
 import UIKit.UIColor
 #endif
 
-public typealias FixableId = String
+public struct FixableId: Codable, Hashable {
+	let id: String
+	public init(_ id: String) {	// Prevent default constructor FixableId()
+		self.id = id;
+	}
+}
 
 public struct FixableDisplay: Codable {
 	public let label: String
