@@ -48,15 +48,29 @@ class FixaRepository {
 		switch value {
 			case .bool(let value, _):
 				guard let instances = repository.bools[key]?.instances.allObjects else { return }
-				_ = instances.map { $0.value = value }
+				instances.forEach { $0.value = value }
 			case .float(let value, _, _, _):
 				guard let instances = repository.floats[key]?.instances.allObjects else { return }
-				_ = instances.map { $0.value = value }
+				instances.forEach { $0.value = value }
 			case .color(let value, _):
 				guard let instances = repository.colors[key]?.instances.allObjects else { return }
-				_ = instances.map { $0.value = value }
+				instances.forEach { $0.value = value }
 			case .divider: break
 		}
+	}
+	
+	func allFixables() -> NamedFixables {
+		var out: [FixableId : FixableConfig] = [:]
+		for b in bools {
+			out[b.key] = b.value.setup
+		}
+		for f in floats {
+			out[f.key] = f.value.setup
+		}
+		for c in colors {
+			out[c.key] = c.value.setup
+		}
+		return out
 	}
 }
 
@@ -66,13 +80,11 @@ public class FixaStream {
 	private var streamName: String
 	private var listener: NWListener!
 	private var controllerConnection: NWConnection?
-	private var fixableConfigurations: NamedFixables
 	private var fixablesDictionary: FixaRepository
 	
 	public init(fixableSetups definitions: [(FixableId, FixableConfig)]) {
 		streamName = (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String) ?? "Unknown app"
 		
-		self.fixableConfigurations = [:]
 		self.fixablesDictionary = FixaRepository.shared
 		
 		for (i, fixable) in definitions.enumerated() {
@@ -85,7 +97,6 @@ public class FixaStream {
 				case let .color(v, d): orderedConfig = .color(value: v, display: FixableDisplay(d.label, order: i))
 				case let .divider(d): orderedConfig = .divider(display: FixableDisplay(d.label, order: i))
 			}
-			self.fixableConfigurations[key] = orderedConfig
 			self.fixablesDictionary.addFixable(key, orderedConfig)
 		}
 	}
@@ -156,7 +167,8 @@ public class FixaStream {
 		
 		let setupData: Data
 		do {
-			let registration = FixaMessageRegister(streamName: streamName, fixables: fixableConfigurations)
+			let registration = FixaMessageRegister(streamName: streamName,
+																						 fixables: fixablesDictionary.allFixables())
 			setupData = try PropertyListEncoder().encode(registration)
 		} catch let error {
 			print("Could not serialize fixables dictionary: \(error)")

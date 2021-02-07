@@ -2,6 +2,7 @@
 
 ## Feature plan
 - iOS 14 permission request
+- FixableConfig should not hold the value on the app side
 - send frequency dropdown in controller
 √ don't key to labels, but to H(label + index) so labels don't have to be unique 
 - register tweakables with app icon
