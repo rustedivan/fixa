@@ -29,7 +29,7 @@ public struct BrowserResult {
 				case .loopback: return "local"
 				default: return "other"
 			}
-		}.joined(separator: " ")
+		}.joined(separator: "/")
 		
 		self.endpoint = nwResult.endpoint
 	}

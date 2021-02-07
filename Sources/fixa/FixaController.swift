@@ -12,6 +12,7 @@ public protocol FixaProtocolDelegate {
 	func sessionDidStart(_ name: String, withFixables: NamedFixables)
 	func sessionDidEnd()
 }
+
 fileprivate var sharedProtocolDelegate: FixaProtocolDelegate? = nil
 
 public func fixaInitProtocol(withDelegate delegate: FixaProtocolDelegate) {

@@ -26,6 +26,8 @@ enum FixaError: Error {
 
 // MARK: Protocol framing
 class FixaProtocol: NWProtocolFramerImplementation {
+	public static var DidEndConnection = Notification.Name(rawValue: "FixaProtocol.DidEndConnection")
+
 	enum MessageType: UInt32 {
 		case invalid = 0
 		case registerFixables = 1
