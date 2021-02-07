@@ -136,9 +136,10 @@ struct FixaProtocolHeader: Codable {
 // MARK: Messages
 struct FixaMessageRegister: Codable {
 	let streamName: String
-	let fixables: NamedFixables
+	let fixables: NamedFixableConfigs
+	let values: NamedFixableValues
 }
 
 struct FixaMessageUpdate: Codable {
-	let updates: NamedFixables
+	let updates: NamedFixableValues
 }

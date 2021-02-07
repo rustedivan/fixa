@@ -15,18 +15,18 @@ import Network
 class FixaRepository {
 	static let shared = FixaRepository()
 	
-	fileprivate var bools: [FixableId : (setup: FixableConfig, instances: NSHashTable<FixableBool>)] = [:]
-	fileprivate var floats: [FixableId : (setup: FixableConfig, instances: NSHashTable<FixableFloat>)] = [:]
-	fileprivate var colors: [FixableId : (setup: FixableConfig, instances: NSHashTable<FixableColor>)] = [:]
+	fileprivate var bools: [FixableId : (value: Bool, setup: FixableConfig, instances: NSHashTable<FixableBool>)] = [:]
+	fileprivate var floats: [FixableId : (value: Float, setup: FixableConfig, instances: NSHashTable<FixableFloat>)] = [:]
+	fileprivate var colors: [FixableId : (value: CGColor, setup: FixableConfig, instances: NSHashTable<FixableColor>)] = [:]
 	
 	func addFixable(_ key: FixableId, _ config: FixableConfig) {
 		switch config {
 			case .bool:
-				bools[key] = (config, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
+				bools[key] = (false, config, NSHashTable<FixableBool>(options: [.weakMemory, .objectPointerPersonality]))
 			case .float:
-				floats[key] = (config, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
+				floats[key] = (-1.0, config, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
 			case .color:
-				colors[key] = (config, NSHashTable<FixableColor>(options: [.weakMemory, .objectPointerPersonality]))
+				colors[key] = (CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 1.0), config, NSHashTable<FixableColor>(options: [.weakMemory, .objectPointerPersonality]))
 			case .divider: break
 		}
 	}
@@ -43,23 +43,22 @@ class FixaRepository {
 		}
 	}
 	
-	func updateFixable(_ key: FixableId, to value: FixableConfig) {
+	func updateFixable(_ key: FixableId, to value: FixableValue) {
 		let repository = FixaRepository.shared
 		switch value {
-			case .bool(let value, _):
+			case let .bool(b):
 				guard let instances = repository.bools[key]?.instances.allObjects else { return }
-				instances.forEach { $0.value = value }
-			case .float(let value, _, _, _):
+				instances.forEach { $0.value = b }
+			case let .float(f):
 				guard let instances = repository.floats[key]?.instances.allObjects else { return }
-				instances.forEach { $0.value = value }
-			case .color(let value, _):
+				instances.forEach { $0.value = f }
+			case let .color(c):
 				guard let instances = repository.colors[key]?.instances.allObjects else { return }
-				instances.forEach { $0.value = value }
-			case .divider: break
+				instances.forEach { $0.value = c }
 		}
 	}
 	
-	func allFixables() -> NamedFixables {
+	func allFixables() -> NamedFixableConfigs {
 		var out: [FixableId : FixableConfig] = [:]
 		for b in bools {
 			out[b.key] = b.value.setup
@@ -69,6 +68,20 @@ class FixaRepository {
 		}
 		for c in colors {
 			out[c.key] = c.value.setup
+		}
+		return out
+	}
+	
+	func allValues() -> NamedFixableValues {
+		var out: [FixableId : FixableValue] = [:]
+		for b in bools {
+			out[b.key] = FixableValue.bool(value: b.value.instances.anyObject?.value ?? false)
+		}
+		for f in floats {
+			out[f.key] = FixableValue.float(value: f.value.instances.anyObject?.value ?? -1.0)
+		}
+		for c in colors {
+			out[c.key] = FixableValue.color(value: c.value.instances.anyObject?.value ?? CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 1.0))
 		}
 		return out
 	}
@@ -92,9 +105,9 @@ public class FixaStream {
 			let config = fixable.1
 			var orderedConfig: FixableConfig
 			switch config {
-				case let .bool(v, d): orderedConfig = .bool(value: v, display: FixableDisplay(d.label, order: i))
-				case let .float(v, min, max, d): orderedConfig = .float(value: v, min: min, max: max, display: FixableDisplay(d.label, order: i))
-				case let .color(v, d): orderedConfig = .color(value: v, display: FixableDisplay(d.label, order: i))
+				case let .bool(d): orderedConfig = .bool(display: FixableDisplay(d.label, order: i))
+				case let .float(min, max, d): orderedConfig = .float(min: min, max: max, display: FixableDisplay(d.label, order: i))
+				case let .color(d): orderedConfig = .color(display: FixableDisplay(d.label, order: i))
 				case let .divider(d): orderedConfig = .divider(display: FixableDisplay(d.label, order: i))
 			}
 			self.fixablesDictionary.addFixable(key, orderedConfig)
@@ -168,7 +181,8 @@ public class FixaStream {
 		let setupData: Data
 		do {
 			let registration = FixaMessageRegister(streamName: streamName,
-																						 fixables: fixablesDictionary.allFixables())
+																						 fixables: fixablesDictionary.allFixables(),
+																						 values: fixablesDictionary.allValues())
 			setupData = try PropertyListEncoder().encode(registration)
 		} catch let error {
 			print("Could not serialize fixables dictionary: \(error)")

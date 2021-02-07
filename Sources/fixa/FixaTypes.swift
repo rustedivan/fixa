@@ -29,24 +29,31 @@ public struct FixableDisplay: Codable {
 }
 
 public enum FixableConfig {
-	case bool(value: Bool, display: FixableDisplay)
-	case float(value: Float, min: Float, max: Float, display: FixableDisplay)
-	case color(value: CGColor, display: FixableDisplay)
+	case bool(display: FixableDisplay)
+	case float(min: Float, max: Float, display: FixableDisplay)
+	case color(display: FixableDisplay)
 	case divider(display: FixableDisplay)
 	
 	public var order: Int {
 		get {
 			switch self {
-				case .bool(_, let display): return display.order
-				case .float(_, _, _, let display): return display.order
-				case .color(_, let display): return display.order
+				case .bool(let display): return display.order
+				case .float(_, _, let display): return display.order
+				case .color(let display): return display.order
 				case .divider(let display): return display.order
 			}
 		}
 	}
 }
 
-public typealias NamedFixables = [FixableId : FixableConfig]
+public enum FixableValue {
+	case bool(value: Bool)
+	case float(value: Float)
+	case color(value: CGColor)
+}
+
+public typealias NamedFixableConfigs = [FixableId : FixableConfig]
+public typealias NamedFixableValues = [FixableId : FixableValue]
 
 public class Fixable<T> {
 	public var value: T { didSet {

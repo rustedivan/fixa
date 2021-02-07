@@ -9,7 +9,7 @@ import Foundation
 import Network
 
 public protocol FixaProtocolDelegate {
-	func sessionDidStart(_ name: String, withFixables: NamedFixables)
+	func sessionDidStart(_ name: String, withFixables: NamedFixableConfigs, withValues: NamedFixableValues)
 	func sessionDidEnd()
 }
 
@@ -30,7 +30,7 @@ public func fixaMakeConnection(to endpoint: NWEndpoint) -> NWConnection {
 	return NWConnection(to: endpoint, using: parameters)
 }
 
-public func fixaSendUpdates(_ fixables: NamedFixables, over connection: NWConnection) {
+public func fixaSendUpdates(_ fixables: NamedFixableValues, over connection: NWConnection) {
 	let message = NWProtocolFramer.Message(fixaMessageType: .updateFixables)
 	let context = NWConnection.ContentContext(identifier: "FixaValues", metadata: [message])
 	
@@ -62,10 +62,10 @@ public func fixaReceiveMessage(data: Data?, context: NWConnection.ContentContext
 	} else if let message = context?.protocolMetadata(definition: FixaProtocol.definition) as? NWProtocolFramer.Message {
 		switch message.fixaMessageType {
 			case .registerFixables:
-				if let (streamName, initialFixables) = parseRegistration(registrationData: data) {
+				if let (streamName, initialFixables, initialValues) = parseRegistration(registrationData: data) {
 					print("Fixa controller: received registration from \(streamName): \(initialFixables.count) fixables registered: \(initialFixables.keys)")
 					
-					sharedProtocolDelegate?.sessionDidStart(streamName, withFixables: initialFixables)
+					sharedProtocolDelegate?.sessionDidStart(streamName, withFixables: initialFixables, withValues: initialValues)
 				} else {
 					sharedProtocolDelegate?.sessionDidEnd()
 				}
@@ -88,7 +88,7 @@ public func fixaEndConnection(_ connection: NWConnection) {
 	})
 }
 
-func parseRegistration(registrationData: Data?) -> (String, NamedFixables)? {
+func parseRegistration(registrationData: Data?) -> (String, NamedFixableConfigs, NamedFixableValues)? {
 	guard let registrationData = registrationData else {
 		print("Fixa controller: received empty registration")
 		return nil
@@ -99,5 +99,5 @@ func parseRegistration(registrationData: Data?) -> (String, NamedFixables)? {
 		return nil
 	}
 
-	return (registration.streamName, registration.fixables)
+	return (registration.streamName, registration.fixables, registration.values)
 }
