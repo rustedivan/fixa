@@ -33,6 +33,7 @@ public enum FixableConfig {
 	case float(min: Float, max: Float, display: FixableDisplay)
 	case color(display: FixableDisplay)
 	case divider(display: FixableDisplay)
+	case group(contents: [(FixableId, FixableConfig)], display: FixableDisplay)
 	
 	public var order: Int {
 		get {
@@ -41,6 +42,7 @@ public enum FixableConfig {
 				case .float(_, _, let display): return display.order
 				case .color(let display): return display.order
 				case .divider(let display): return display.order
+				case .group(_, let display): return display.order
 			}
 		}
 	}

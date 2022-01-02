@@ -15,9 +15,12 @@ import Network
 class FixaRepository {
 	static let shared = FixaRepository()
 	
+	// Values
 	fileprivate var bools: [FixableId : (value: Bool, setup: FixableConfig, instances: NSHashTable<FixableBool>)] = [:]
 	fileprivate var floats: [FixableId : (value: Float, setup: FixableConfig, instances: NSHashTable<FixableFloat>)] = [:]
 	fileprivate var colors: [FixableId : (value: CGColor, setup: FixableConfig, instances: NSHashTable<FixableColor>)] = [:]
+	// Groups and dividers
+	fileprivate var containers: [FixableId : FixableConfig] = [:]
 	
 	func addFixable(_ key: FixableId, _ config: FixableConfig) {
 		switch config {
@@ -27,7 +30,13 @@ class FixaRepository {
 				floats[key] = (-1.0, config, NSHashTable<FixableFloat>(options: [.weakMemory, .objectPointerPersonality]))
 			case .color:
 				colors[key] = (CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 1.0), config, NSHashTable<FixableColor>(options: [.weakMemory, .objectPointerPersonality]))
-			case .divider: break
+			case let .group(contents, _):
+				containers[key] = config
+				for (id, config) in contents {
+					addFixable(id, config)
+				}
+			case .divider:
+				containers[key] = config
 		}
 	}
 	
@@ -39,7 +48,9 @@ class FixaRepository {
 				floats[key]?.instances.add(floatInstance)
 			case let colorInstance as FixableColor:
 				colors[key]?.instances.add(colorInstance)
-			default: break
+			default:
+				print("Fixa repository: \(key.id) should not have any instances.")
+				break
 		}
 	}
 	
@@ -68,6 +79,9 @@ class FixaRepository {
 		}
 		for c in colors {
 			out[c.key] = c.value.setup
+		}
+		for c in containers {
+			out[c.key] = c.value
 		}
 		return out
 	}
@@ -109,6 +123,7 @@ public class FixaStream {
 				case let .float(min, max, d): orderedConfig = .float(min: min, max: max, display: FixableDisplay(d.label, order: i))
 				case let .color(d): orderedConfig = .color(display: FixableDisplay(d.label, order: i))
 				case let .divider(d): orderedConfig = .divider(display: FixableDisplay(d.label, order: i))
+				case let .group(contents, d): orderedConfig = .group(contents: contents, display: FixableDisplay(d.label, order: i))
 			}
 			self.fixablesDictionary.addFixable(key, orderedConfig)
 		}

@@ -14,6 +14,7 @@ extension FixableConfig: Codable {
 		case float, floatValue, floatMin, floatMax
 		case color, colorRed, colorGreen, colorBlue, colorAlpha
 		case divider
+		case group, groupContents
 	}
 	
 	public func encode(to encoder: Encoder) throws {
@@ -33,6 +34,11 @@ extension FixableConfig: Codable {
 			case let .divider(display):
 				var dividerContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
 				try dividerContainer.encode(display, forKey: .display)
+			case let .group(contents, display):
+				var groupContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .group)
+				let encodableContents = NamedFixableConfigs(uniqueKeysWithValues: contents)
+				try groupContainer.encode(encodableContents, forKey: .groupContents)
+				try groupContainer.encode(display, forKey: .display)
 		}
 	}
 
@@ -60,7 +66,13 @@ extension FixableConfig: Codable {
 				let dividerContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .divider)
 				let display = try dividerContainer.decode(FixableDisplay.self, forKey: .display)
 				self = .divider(display: display)
-			case .boolValue, .floatValue, .floatMin, .floatMax, .colorRed, .colorGreen, .colorBlue, .colorAlpha, .display:
+			case .group:
+				let groupContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .group)
+				let decodableContents = try groupContainer.decode(NamedFixableConfigs.self, forKey: .groupContents)
+				let display = try groupContainer.decode(FixableDisplay.self, forKey: .display)
+				let contents = decodableContents.map { ($0.0, $0.1) }
+				self = .group(contents: contents, display: display)
+			case .boolValue, .floatValue, .floatMin, .floatMax, .colorRed, .colorGreen, .colorBlue, .colorAlpha, .groupContents, .display:
 				throw FixaError.serializationError("Unexpected \(key) in fixable config packet")
 		}
 	}
