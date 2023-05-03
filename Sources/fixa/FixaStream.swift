@@ -10,6 +10,8 @@ import Foundation
 import Network
 #if canImport(UIKit)
 	import UIKit.UIDevice
+#else
+	import CoreGraphics.CGColor
 #endif
 
 class FixaRepository {
