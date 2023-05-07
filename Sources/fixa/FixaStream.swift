@@ -136,6 +136,13 @@ public class FixaStream {
 		let protocolOptions = NWProtocolFramer.Options(definition: FixaProtocol.definition)
 		parameters.defaultProtocolStack.applicationProtocols.insert(protocolOptions, at: 0)
 		
+		if let infoPlist = Bundle.main.path(forResource: "Info", ofType: "plist") {
+			let plistContents = NSDictionary(contentsOfFile: infoPlist)
+			if plistContents?["NSLocalNetworkUsageDescription"] == nil {
+				print("Warning: NSLocalNetworkUsageDescription must be set in your Info.plist to allow Fixa to use Bonjour.")
+			}
+		}
+		
 		do {
 			listener = try NWListener(using: parameters)
 		} catch let error {
