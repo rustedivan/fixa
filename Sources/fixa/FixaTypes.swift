@@ -17,6 +17,9 @@ public struct FixableId: Codable, Hashable {
 	public init(_ id: String) {	// Prevent default constructor FixableId()
 		self.id = id;
 	}
+	public var debugDescription: String {
+		return id
+	}
 }
 
 public struct FixableDisplay: Codable {

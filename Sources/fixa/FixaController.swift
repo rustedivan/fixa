@@ -63,7 +63,8 @@ public func fixaReceiveMessage(data: Data?, context: NWConnection.ContentContext
 		switch message.fixaMessageType {
 			case .registerFixables:
 				if let (streamName, initialFixables, initialValues) = parseRegistration(registrationData: data) {
-					print("Fixa controller: received registration from \(streamName): \(initialFixables.count) fixables registered: \(initialFixables.keys)")
+					let fixableNames = initialFixables.keys.map { $0.id }
+					print("Fixa controller: received registration from \(streamName): \(initialFixables.count) fixables registered: \(fixableNames)")
 					
 					sharedProtocolDelegate?.sessionDidStart(streamName, withFixables: initialFixables, withValues: initialValues)
 				} else {

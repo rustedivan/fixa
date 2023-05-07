@@ -3,6 +3,7 @@
 ## Feature plan
 - iOS 14 permission request
 - groupable controllers
+- warn if FixableFloat is created without a FixaStream
 - if registration is invalid, we get endless disconnection spam
 √ FixableConfig should not hold the value on the app side
 - "throttled" mode that debounces changes for 0.5 seconds if client-side reactions are slow
