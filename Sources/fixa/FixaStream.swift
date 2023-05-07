@@ -197,8 +197,19 @@ public class FixaStream {
 		
 		let setupData: Data
 		do {
+			// Find all FixableIds that are contained in a group
+			let groupedIds = fixablesDictionary.allFixables()
+				.flatMap {
+					if case .group(let contents, _) = $0.value {
+						return contents.map { groupedFixable in groupedFixable.0 }
+					} else {
+						return []
+					}
+				}
+			let fixableDisplayTree = fixablesDictionary.allFixables().filter { groupedIds.contains($0.key) == false }
+			
 			let registration = FixaMessageRegister(streamName: streamName,
-																						 fixables: fixablesDictionary.allFixables(),
+																						 fixables: fixableDisplayTree,
 																						 values: fixablesDictionary.allValues())
 			setupData = try PropertyListEncoder().encode(registration)
 		} catch let error {

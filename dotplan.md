@@ -2,7 +2,7 @@
 
 ## Feature plan
 - iOS 14 permission request
-- groupable controllers
+√ groupable controllers
 - warn if FixableFloat is created without a FixaStream
 - if registration is invalid, we get endless disconnection spam
 √ FixableConfig should not hold the value on the app side
@@ -10,6 +10,8 @@
 √ don't key to labels, but to H(label + index) so labels don't have to be unique 
 - register tweakables with app icon
 - string tweaker
+- prevent nestable groups
+- don't send textfield edits before Enter keystroke
 - int tweaker
 - dropdown tweaker
 - array tweaker
@@ -24,9 +26,3 @@
 - angle/knob tweaker
 - can the settings report say the name of its variable?
 - instances must be able to dereg themselves on destruction (just check that it does, .weakMemory should handle it)
-
-
-## Grouping
-In sendFixableRegistration, fixablesDictionary.allFixables should contain the dividers and groups too, otherwise they won't be added to the FixaMessageRegister. fixablesDictionary.allValues can omit them though.
-That means that the FixaRepository should hold lists of dividers and groups too, but can filter them out when constructing allValues.
-Then, when the controller gets the initial setup/registration, it can construct the groups and dividers, but doesn't track any value changes on them.
