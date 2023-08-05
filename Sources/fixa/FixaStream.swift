@@ -116,19 +116,31 @@ public class FixaStream {
 		
 		self.fixablesDictionary = FixaRepository.shared
 		
-		for (i, fixable) in definitions.enumerated() {
+		let indexedFixables = indexFixables(definitions)
+		
+		for (key, fixable) in indexedFixables {
+			self.fixablesDictionary.addFixable(key, fixable)
+		}
+	}
+	
+	func indexFixables(_ fixables: [(FixableId, FixableConfig)]) -> [(FixableId, FixableConfig)] {
+		var outFixables: [(FixableId, FixableConfig)] = []
+		for (i, fixable) in fixables.enumerated() {
 			let key = fixable.0
 			let config = fixable.1
-			var orderedConfig: FixableConfig
+			var indexedConfig: FixableConfig
 			switch config {
-				case let .bool(d): orderedConfig = .bool(display: FixableDisplay(d.label, order: i))
-				case let .float(min, max, d): orderedConfig = .float(min: min, max: max, display: FixableDisplay(d.label, order: i))
-				case let .color(d): orderedConfig = .color(display: FixableDisplay(d.label, order: i))
-				case let .divider(d): orderedConfig = .divider(display: FixableDisplay(d.label, order: i))
-				case let .group(contents, d): orderedConfig = .group(contents: contents, display: FixableDisplay(d.label, order: i))
+				case let .bool(d): indexedConfig = .bool(display: FixableDisplay(d.label, order: i))
+				case let .float(min, max, d): indexedConfig = .float(min: min, max: max, display: FixableDisplay(d.label, order: i))
+				case let .color(d): indexedConfig = .color(display: FixableDisplay(d.label, order: i))
+				case let .divider(d): indexedConfig = .divider(display: FixableDisplay(d.label, order: i))
+				case let .group(contents, d):
+					let indexedGroupContents = indexFixables(contents)
+					indexedConfig = .group(contents: indexedGroupContents, display: FixableDisplay(d.label, order: i))
 			}
-			self.fixablesDictionary.addFixable(key, orderedConfig)
+			outFixables.append((key, indexedConfig))
 		}
+		return outFixables
 	}
 
 	public func startListening() {

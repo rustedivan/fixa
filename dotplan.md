@@ -1,10 +1,11 @@
 #  Fixa dotplan
 
 ## Feature plan
-- reformulate grouped controls as a list of controls that should move into the group, that should make things a lot cleaner
+x reformulate grouped controls as a list of controls that should move into the group, that should make things a lot cleaner
 - move groups to tabs
 - if registration is invalid, we get endless disconnection spam
 - connecting twice breaks the connection
+- default value should be set when registering fixables, no value in having multiple defaults
 
 - autoconnect to apps if checked
 - auto-select midicontroller if clientState.selectedController exists
