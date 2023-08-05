@@ -1,8 +1,6 @@
 #  Fixa dotplan
 
 ## Feature plan
-x reformulate grouped controls as a list of controls that should move into the group, that should make things a lot cleaner
-- move groups to tabs
 - if registration is invalid, we get endless disconnection spam
 - connecting twice breaks the connection
 - default value should be set when registering fixables, no value in having multiple defaults
@@ -37,3 +35,5 @@ x reformulate grouped controls as a list of controls that should move into the g
 √ don't key to labels, but to H(label + index) so labels don't have to be unique 
 √ save/restore
 x warn if FixableFloat is created without a FixaStream
+x reformulate grouped controls as a list of controls that should move into the group, that should make things a lot cleaner
+√ move groups to tabs
